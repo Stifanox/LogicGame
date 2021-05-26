@@ -2,10 +2,10 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        index:'./src/index.js'
+        index: './src/index.js'
     },
     output: {
-      filename: '[name].js', 
+        filename: '[name].js',
     },
     devtool: "source-map",
     mode: 'development', // none, development, production
@@ -16,9 +16,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             hash: true,
             filename: './index.html', //relative to root of the application
-            title:"Giercowanie",
+            title: "Giercowanie",
             template: './src/index.html',
-            chunks:['index']
+            chunks: ['index']
         }),
     ],
     module: {
@@ -39,6 +39,6 @@ module.exports = {
             }
         ]
     },
-    
+
 
 };
