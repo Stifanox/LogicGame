@@ -16,11 +16,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             hash: true,
             filename: './index.html', //relative to root of the application
-<<<<<<< HEAD
             title: "Giercowanie",
-=======
-            title:"LogicGame",
->>>>>>> 1a480bc0ebb0c7b39810973ade30b74d4233cc79
             template: './src/index.html',
             chunks: ['index']
         }),
@@ -44,7 +40,7 @@ module.exports = {
             {
                 test: /.(fbx)$/i,
                 type: 'asset/resource',
-             }
+            }
         ]
     },
 
