@@ -2,9 +2,22 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import keyMapper from "./KeyMapper"
 import KeyPressed from './KeyPressed';
 import test from "../model/rp_nathan_animated_003_walking.fbx"
+import { Vector3 } from 'three';
+
+/*
+Klasa Player służąca jak podstawa do tworzenia graczy na planszy. 
+Wykorzystuje modele FBX
+*/
+
+//TODO: raycaster wykrywający podłogę 
+//TODO: raycaster wykrywa czy jest w powietrzu, jak jest to wtedy ustawia inAir na true jak nie to na false
+//FIXME: usunąć zmianę zmiennej inAir na jump'ie po implementacji raycastera
+//TODO: wykonywać obrót postaci w stronę którą idzie 
 
 export default class Player{
     constructor(scene) {
+        //inAir służy do sprawdzenia czy postać jest w powietrzu
+        this.inAir = false
         this.scene = scene
         this.jumpVelocity = 0
         this.doneJumping = false
@@ -61,20 +74,28 @@ export default class Player{
    
 
     movePlayer(){
+        let upDown = null
+        let leftRight = null
+
         if(KeyPressed.up){
-            this.model.translateZ(2)
+            upDown = Math.PI
         }
         if(KeyPressed.down){
-            this.model.translateZ(-2)
+            upDown = 0
         }
         if(KeyPressed.left){
-            this.model.translateX(2)
+            leftRight = Math.PI * 1.5
         }
         if(KeyPressed.right){
-            this.model.translateX(-2)
+            leftRight = Math.PI / 2 
         }
         if(KeyPressed.jump){
             this.jump()
+        }
+
+        if(upDown != null || leftRight != null){
+            this.model.rotation.y = getRotation(upDown,leftRight)
+            this.model.translateZ(2)
         }
     }
 
@@ -87,9 +108,10 @@ export default class Player{
     }
 
     jumpUp(){
-            this.jumpVelocity += 0.3
+            this.inAir = true
+            this.jumpVelocity += 3
             this.model.translateY(this.jumpVelocity)
-            if(this.jumpVelocity > 4){
+            if(this.jumpVelocity > 10){
                 this.doneJumping = true
             }
         
@@ -97,10 +119,11 @@ export default class Player{
     //TODO: w warunku z lini 104 dać żeby jump velocity było zmieniane na 0 w momencie jak wykryje podłogę 
     fallDown(){
             if(this.jumpVelocity > -5){
-            this.jumpVelocity -= 0.1
+            this.jumpVelocity -= 0.8
             }
             this.model.translateY(this.jumpVelocity)
             if(this.model.position.y <= 0 ){
+                this.inAir = false
                 this.doneJumping = false
                 KeyPressed.jump = false
                 this.jumpVelocity =0
@@ -115,4 +138,23 @@ export default class Player{
             this.model.rotation.y = Math.PI
         })
     }
+
+   
+}
+
+function getRotation(...value){
+    if((value[0] || value[0]==0) && value[1]){
+        if(value[0]== 0 && value[1]==Math.PI*1.5){
+            return (Math.PI *2  + Math.PI * 1.5) /2
+        }else{
+            return (value[0]+value[1])/2
+        }
+    }
+    else if(value[0] || value[0] == 0){
+        return value[0]
+    } 
+    else if(value[1]){
+        return value [1]
+    }
+
 }
