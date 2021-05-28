@@ -2,18 +2,30 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import keyMapper from "./KeyMapper"
 import KeyPressed from './KeyPressed';
 import test from "../model/rp_nathan_animated_003_walking.fbx"
-import { Vector3 } from 'three';
+import { Ray, Raycaster, Vector3 } from 'three';
 
 /*
 Klasa Player służąca jak podstawa do tworzenia graczy na planszy. 
-Wykorzystuje modele FBX
+Wykorzystuje modele FBX.
+Model jest automatycznie ładowany po wywołaniu klasy
+@param scene: THREE.Scene
+@param this.inAir: Boolean
+@param this.scene: THREE.Scene
+@param this.jumpVelocity: Int
+@param this.doneJumping: Boolean
+@param this.domElement: DOMElement
+@param this.loader: THREE.FBXLoader
+@param this.model: THREE.Model
+@param this.raycaster: THREE.Raycaster
+@param this.sceneObjects: Object<THREE.Mesh>
 */
 
+//TODO: kolizja występuje poprzez hitbox z dużym boxem który jest nałożony na cały model
 //TODO: raycaster wykrywający podłogę 
 //TODO: raycaster wykrywa czy jest w powietrzu, jak jest to wtedy ustawia inAir na true jak nie to na false
 //FIXME: usunąć zmianę zmiennej inAir na jump'ie po implementacji raycastera
-//TODO: wykonywać obrót postaci w stronę którą idzie 
-
+//FIXME:Możliwe że wyjebać raycastera trzeba, obejrzeć film o dinozaurze w threejs
+//TODO: zrobić że po dropie jak jest in air nie można było skakać
 export default class Player{
     constructor(scene) {
         //inAir służy do sprawdzenia czy postać jest w powietrzu
@@ -24,10 +36,13 @@ export default class Player{
         this.domElement = window
         this.loader = new FBXLoader()
         this.model = null
+        this.raycaster = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0).normalize(),0,50)
+        this.sceneObjects = this.scene.children
         this.init()
     }
 
     init(){
+        this.modelLoad()
         this.domElement.addEventListener("keydown", (e) => this.eventMapper(e.keyCode,"down"))
         this.domElement.addEventListener("keyup", (e) => this.eventMapper(e.keyCode,"up"))
     }
@@ -93,6 +108,7 @@ export default class Player{
             this.jump()
         }
 
+        //ustawienie rotacji modelu na podstawie jego ruchu
         if(upDown != null || leftRight != null){
             this.model.rotation.y = getRotation(upDown,leftRight)
             this.model.translateZ(2)
@@ -114,11 +130,11 @@ export default class Player{
             if(this.jumpVelocity > 10){
                 this.doneJumping = true
             }
-        
+                
     }
     //TODO: w warunku z lini 104 dać żeby jump velocity było zmieniane na 0 w momencie jak wykryje podłogę 
     fallDown(){
-            if(this.jumpVelocity > -5){
+            if(this.jumpVelocity > -17){
             this.jumpVelocity -= 0.8
             }
             this.model.translateY(this.jumpVelocity)
@@ -129,16 +145,23 @@ export default class Player{
                 this.jumpVelocity =0
             }
     }
-
+    //bierze model w formacie .fbx
     modelLoad(model = null){
         this.loader.load(test, (obj) =>{
             this.scene.add(obj)
             this.model= obj
-            //placeholder
+            //placeholder albo nie XD
             this.model.rotation.y = Math.PI
+            this.sceneObjects = this.scene.children
+            console.log(this.sceneObjects);
         })
     }
 
+    checkFloor(){
+        // const ray = new Ray(this.model.position,new Vector3(0,-1,0))
+        // this.raycaster.ray = ray
+        // const intersects = this.raycaster.intersectObject()
+    }
    
 }
 

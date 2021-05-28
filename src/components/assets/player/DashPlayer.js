@@ -15,6 +15,7 @@ export default class DashPlayer extends Player{
     }
 
     //FIXME: Może się dupcyć później ze stroną świata naprawić
+    //TODO: nadpisz metodę jump tak aby była blokowana jak gracz jest w powietrzu po spadkus
     dash(code){
        if(code == 17 && !this.blockDash){
        
@@ -101,6 +102,7 @@ export default class DashPlayer extends Player{
     updatePlayer(){
         this.movePlayer()
         this.dash()
+        // this.checkFloor()
     }
 
 }
