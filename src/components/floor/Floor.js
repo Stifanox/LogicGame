@@ -28,7 +28,8 @@ export default class Floor extends Group {
             this.offsetX = 50 - (this.coords[0] / 2) * 100
             this.offsetZ = 50 - (this.coords[1] / 2) * 100
 
-            camera.updatePosition(0, 300 + (this.coords[0] * 10) + (this.coords[1] * 10), 300 + (this.coords[0] * 20) + (this.coords[1] * 20))
+            //TODO: Ewentualna sprytniejsza zmiana pozycji, ta działa ale nie jest napisana profesjonalnie.
+            camera.updatePosition(0, 300 + (this.coords[0] * 10) + (this.coords[1] * 10), 300 + (this.coords[0] * 20) + (this.coords[1] * 60))
 
             this.createFullArray(instructions)
         }
@@ -42,6 +43,7 @@ export default class Floor extends Group {
             }
             this.boxes.push(tempArray)
         }
+        console.log(...this.boxes)
         if (instructions.holes) {
             this.makeHoles(instructions)
         } else {
@@ -60,7 +62,7 @@ export default class Floor extends Group {
                 }
             }
         })
-        console.log(this.boxes)
+        console.log(...this.boxes)
         this.collapseBoxes()
     }
 
@@ -74,10 +76,10 @@ export default class Floor extends Group {
                     size = 1
                     freeSpace = true
                     while (freeSpace) {
-                        for (let i = size; i > 0; i--) {
-                            for (let j = size; j > 0; j--) {
+                        for (let i = size; i >= 0; i--) {
+                            for (let j = size; j >= 0; j--) {
                                 if (i == size || j == size) {
-                                    if (this.boxes[x + i] == undefined || this.boxes[x + i][z + j] != 1 || this.boxes[x + i][z + j] != 1 || this.boxes[x + i][z + j] != 1) {
+                                    if (this.boxes[x + i] == undefined || this.boxes[x + i][z + j] != 1) {
                                         this.boxesToCreate.push({ x: x, z: z, size: size })
                                         freeSpace = false
                                         break
@@ -95,6 +97,7 @@ export default class Floor extends Group {
                                 this.boxes[x + i][z + j] = 2
                             }
                         }
+                        console.log(...this.boxes)
                         size++
                     }
                 }
