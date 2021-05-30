@@ -14,6 +14,7 @@ export default class JumpPlayer extends Player{
         this.domElement.addEventListener("keydown", (e) => this.doubleJump(e.keyCode))
     }
     
+    //TODO: Zrobić aby double jump działał
     //zakłada że pierwszy skok się wykonał
     doubleJump(code){
         if(code == 32 && this.doubleJumpAvailable){
@@ -47,6 +48,6 @@ export default class JumpPlayer extends Player{
     updatePlayer(){
         this.movePlayer()
         this.doubleJump()
-        // this.checkFloor()
+        this.checkFloor()
     }
 }

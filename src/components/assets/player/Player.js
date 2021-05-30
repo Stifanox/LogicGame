@@ -21,22 +21,18 @@ Model jest automatycznie ładowany po wywołaniu klasy
 */
 
 //TODO: kolizja występuje poprzez hitbox z dużym boxem który jest nałożony na cały model
-//TODO: raycaster wykrywający podłogę 
-//TODO: raycaster wykrywa czy jest w powietrzu, jak jest to wtedy ustawia inAir na true jak nie to na false
-//FIXME: usunąć zmianę zmiennej inAir na jump'ie po implementacji raycastera
-//FIXME:Możliwe że wyjebać raycastera trzeba, obejrzeć film o dinozaurze w threejs
-//TODO: zrobić że po dropie jak jest in air nie można było skakać
 export default class Player{
     constructor(scene) {
         //inAir służy do sprawdzenia czy postać jest w powietrzu
-        this.inAir = false
+        this.corretion = true
         this.scene = scene
         this.jumpVelocity = 0
         this.doneJumping = false
         this.domElement = window
+        this.onSurface = true
         this.loader = new FBXLoader()
         this.model = null
-        this.raycaster = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0).normalize(),0,50)
+        this.raycaster = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0))
         this.sceneObjects = this.scene.children
         this.init()
     }
@@ -105,7 +101,9 @@ export default class Player{
             leftRight = Math.PI / 2 
         }
         if(KeyPressed.jump){
-            this.jump()
+            if(!this.doneJumping){
+                this.jumpUp()
+            }
         }
 
         //ustawienie rotacji modelu na podstawie jego ruchu
@@ -115,34 +113,25 @@ export default class Player{
         }
     }
 
-    jump(){
-        if(!this.doneJumping){
-           this.jumpUp()
-        }else{
-         this.fallDown()
-        }
-    }
+    
 
     jumpUp(){
-            this.inAir = true
             this.jumpVelocity += 3
             this.model.translateY(this.jumpVelocity)
             if(this.jumpVelocity > 10){
                 this.doneJumping = true
+                KeyPressed.jump = false
             }
                 
     }
-    //TODO: w warunku z lini 104 dać żeby jump velocity było zmieniane na 0 w momencie jak wykryje podłogę 
     fallDown(){
             if(this.jumpVelocity > -17){
             this.jumpVelocity -= 0.8
             }
             this.model.translateY(this.jumpVelocity)
-            if(this.model.position.y <= 0 ){
-                this.inAir = false
-                this.doneJumping = false
-                KeyPressed.jump = false
-                this.jumpVelocity =0
+
+            if(this.model.position.y < 0){
+                this.model.position.y = 0
             }
     }
     //bierze model w formacie .fbx
@@ -153,15 +142,35 @@ export default class Player{
             //placeholder albo nie XD
             this.model.rotation.y = Math.PI
             this.sceneObjects = this.scene.children
-            console.log(this.sceneObjects);
+            this.model.position.set(0,500,0)
         })
     }
 
     checkFloor(){
-        // const ray = new Ray(this.model.position,new Vector3(0,-1,0))
-        // this.raycaster.ray = ray
-        // const intersects = this.raycaster.intersectObject()
-    }
+        if(this.model){
+            const ray = new Ray(this.model.position.clone().add(new Vector3(0,50,0)),new Vector3(0,-1,0))
+            this.raycaster.ray = ray
+            const intersects = this.raycaster.intersectObjects(this.sceneObjects)
+
+            if(intersects[0]){
+                if(intersects[0].distance < 55){
+                    this.doneJumping = false
+                    this.jumpVelocity = 0
+                    if(this.corretion){
+                       this.model.position.y += 50 - intersects[0].distance
+       
+                    }
+                    this.corretion = false
+                   }
+                   else{
+
+                       this.corretion = true
+                       this.fallDown()
+                   }
+       }
+            }
+        }
+        
    
 }
 
