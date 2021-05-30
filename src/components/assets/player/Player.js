@@ -9,7 +9,6 @@ Klasa Player służąca jak podstawa do tworzenia graczy na planszy.
 Wykorzystuje modele FBX.
 Model jest automatycznie ładowany po wywołaniu klasy
 @param scene: THREE.Scene
-@param this.inAir: Boolean
 @param this.scene: THREE.Scene
 @param this.jumpVelocity: Int
 @param this.doneJumping: Boolean
@@ -20,14 +19,14 @@ Model jest automatycznie ładowany po wywołaniu klasy
 @param this.sceneObjects: Object<THREE.Mesh>
 */
 
-//TODO: kolizja występuje poprzez hitbox z dużym boxem który jest nałożony na cały model
+//TODO: raycaster wykrywający blok przed tobą
 export default class Player{
     constructor(scene) {
-        //inAir służy do sprawdzenia czy postać jest w powietrzu
         this.corretion = true
         this.scene = scene
         this.jumpVelocity = 0
         this.doneJumping = false
+        this.jumped = false
         this.domElement = window
         this.onSurface = true
         this.loader = new FBXLoader()
@@ -116,6 +115,7 @@ export default class Player{
     
 
     jumpUp(){
+            this.jumped = true
             this.jumpVelocity += 3
             this.model.translateY(this.jumpVelocity)
             if(this.jumpVelocity > 10){
@@ -125,6 +125,7 @@ export default class Player{
                 
     }
     fallDown(){
+        console.log("Call");
             if(this.jumpVelocity > -17){
             this.jumpVelocity -= 0.8
             }
@@ -142,8 +143,34 @@ export default class Player{
             //placeholder albo nie XD
             this.model.rotation.y = Math.PI
             this.sceneObjects = this.scene.children
+            this.sceneObjects = this.sceneObjects.filter(el => el != obj)
+            
+            this.createIntersection()
+
             this.model.position.set(0,500,0)
         })
+    }
+
+    createIntersection(){
+
+        const deconstructedData = {arr:[]}
+
+        this.sceneObjects.forEach((el,index) =>{
+            if(el.type =="Group"){
+                deconstructedData[index] = el
+                deconstructedData.arr.push(...el.children)
+            }
+    })
+
+    this.sceneObjects.push(...deconstructedData.arr)
+    for(let el in deconstructedData){
+        if(el == "arr"){
+            continue
+        }
+        else{
+            this.sceneObjects.splice(this.sceneObjects.indexOf(deconstructedData[el]),1)
+        }
+    }
     }
 
     checkFloor(){
@@ -154,16 +181,15 @@ export default class Player{
 
             if(intersects[0]){
                 if(intersects[0].distance < 55){
+                    this.jumped = false
                     this.doneJumping = false
                     this.jumpVelocity = 0
                     if(this.corretion){
                        this.model.position.y += 50 - intersects[0].distance
-       
                     }
                     this.corretion = false
                    }
                    else{
-
                        this.corretion = true
                        this.fallDown()
                    }

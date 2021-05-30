@@ -14,22 +14,18 @@ export default class JumpPlayer extends Player{
         this.domElement.addEventListener("keydown", (e) => this.doubleJump(e.keyCode))
     }
     
-    //TODO: Zrobić aby double jump działał
-    //zakłada że pierwszy skok się wykonał
     doubleJump(code){
-        if(code == 32 && this.doubleJumpAvailable){
-            if(this.inAir){
-               this.doubleJumpAvailable = false 
-               this.changeDoubleJumpState()
-            }
-            this.jumpVelocity = 0
-            this.doneJumping = false
+        if(code == 32 && this.doubleJumpAvailable && this.jumped){
+                this.doneJumping = false
+                this.jumpVelocity = 0
+                this.doubleJumpAvailable = false 
+                this.changeDoubleJumpState()
         }
     }
 
     changeDoubleJumpState(){
         return new Promise((resolve,reject) =>{
-            if(!this.doubleJumpAvailable && !this.inAir){
+            if(!this.doubleJumpAvailable){
                 setTimeout(() =>{
                     this.doubleJumpAvailable = true
                     resolve()
