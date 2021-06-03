@@ -15,7 +15,7 @@ export default class DashPlayer extends Player{
     }
 
     dash(code){
-       if(code == 17 && !this.blockDash && !this.blockMove){
+       if(code == 16 && !this.blockDash && !this.blockMove){
        
         if(KeyPressed.up){
             const currentPosition = this.model.position.z
