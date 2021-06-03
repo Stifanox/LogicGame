@@ -12,8 +12,9 @@ export default class Floor extends Group {
     //  holes: true
     //  holePos: [ "5/3x5/5", etc.. ]
     //}
-    constructor(instructions, camera) {
+    constructor(instructions, camera, scene) {
         super()
+        this.scene = scene
         this.boxes = []
         this.init(instructions, camera)
     }
@@ -43,7 +44,6 @@ export default class Floor extends Group {
             }
             this.boxes.push(tempArray)
         }
-        console.log(...this.boxes)
         if (instructions.holes) {
             this.makeHoles(instructions)
         } else {
@@ -62,7 +62,6 @@ export default class Floor extends Group {
                 }
             }
         })
-        console.log(...this.boxes)
         this.collapseBoxes()
     }
 
@@ -97,7 +96,6 @@ export default class Floor extends Group {
                                 this.boxes[x + i][z + j] = 2
                             }
                         }
-                        console.log(...this.boxes)
                         size++
                     }
                 }
@@ -110,8 +108,8 @@ export default class Floor extends Group {
         this.boxesToCreate.forEach(box => {
             let tempOffX = this.offsetX + (box.size - 1) * 50
             let tempOffZ = this.offsetZ + (box.size - 1) * 50
-
             this.add(new BaseBlock(tempOffX + (box.x * 100), 0, tempOffZ + (box.z * 100), box.size))
         })
+        this.scene.add(this)
     }
 }

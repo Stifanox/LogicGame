@@ -16,6 +16,6 @@ export default class Box extends Mesh {
             opacity: 1
         }))
         this.rotation.y += rot
-        this.position.set((posX * 100) - 50, posY+50+size/2, posZ * 100-50)
+        this.position.set((posX * 100) - 50, posY + 50 + size / 2, posZ * 100 - 50)
     }
 }
