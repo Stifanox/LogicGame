@@ -25,11 +25,12 @@ export default class JumpPlayer extends Player{
 
     changeDoubleJumpState(){
         return new Promise((resolve,reject) =>{
-            if(!this.doubleJumpAvailable){
+            //!this.correction służy aby określić czy jesteśmy na ziemi (dla tej metody)
+            if(!this.doubleJumpAvailable && !this.corretion){
                 setTimeout(() =>{
                     this.doubleJumpAvailable = true
                     resolve()
-                },1000)
+                },10)
             }
             else{
                 setTimeout(()=>{
@@ -45,5 +46,6 @@ export default class JumpPlayer extends Player{
         this.movePlayer()
         this.doubleJump()
         this.checkFloor()
+        this.checkWall()
     }
 }

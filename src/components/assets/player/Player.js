@@ -9,19 +9,31 @@ Klasa Player służąca jak podstawa do tworzenia graczy na planszy.
 Wykorzystuje modele FBX.
 Model jest automatycznie ładowany po wywołaniu klasy
 @param scene: THREE.Scene
+@param this.corretion: Boolean
+@param this.onSurface: Boolean
+@param this.jumped: Boolean
 @param this.scene: THREE.Scene
 @param this.jumpVelocity: Int
 @param this.doneJumping: Boolean
-@param this.domElement: DOMElement
+@param this.domElement: `DOMElement`
 @param this.loader: THREE.FBXLoader
-@param this.model: THREE.Model
+@param this.model: THREE.Group<Model>
 @param this.raycaster: THREE.Raycaster
 @param this.sceneObjects: Object<THREE.Mesh>
+@param this.blockMove: Boolean
 */
 
-//TODO: raycaster wykrywający blok przed tobą
+/*
+Player wymaga w main => 
+- stworzenia instancji gracza 
+- w render() musi być wywoływana funkcja updatePlayer()
+*/
+
+//TODO: Zrobić aby model ładowały się w klasach podrzędnych 
+
 export default class Player{
     constructor(scene) {
+        this.blockMove = false
         this.corretion = true
         this.scene = scene
         this.jumpVelocity = 0
@@ -31,7 +43,8 @@ export default class Player{
         this.onSurface = true
         this.loader = new FBXLoader()
         this.model = null
-        this.raycaster = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0))
+        this.raycasterFloor = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0))
+        this.raycasterWall = new Raycaster(new Vector3(0,0,0),new Vector3(0,0,-1))
         this.sceneObjects = this.scene.children
         this.init()
     }
@@ -108,7 +121,9 @@ export default class Player{
         //ustawienie rotacji modelu na podstawie jego ruchu
         if(upDown != null || leftRight != null){
             this.model.rotation.y = getRotation(upDown,leftRight)
-            this.model.translateZ(2)
+            if(!this.blockMove){
+                this.model.translateZ(4)
+            }
         }
     }
 
@@ -125,7 +140,6 @@ export default class Player{
                 
     }
     fallDown(){
-        console.log("Call");
             if(this.jumpVelocity > -17){
             this.jumpVelocity -= 0.8
             }
@@ -176,8 +190,8 @@ export default class Player{
     checkFloor(){
         if(this.model){
             const ray = new Ray(this.model.position.clone().add(new Vector3(0,50,0)),new Vector3(0,-1,0))
-            this.raycaster.ray = ray
-            const intersects = this.raycaster.intersectObjects(this.sceneObjects)
+            this.raycasterFloor.ray = ray
+            const intersects = this.raycasterFloor.intersectObjects(this.sceneObjects)
 
             if(intersects[0]){
                 if(intersects[0].distance < 55){
@@ -197,7 +211,24 @@ export default class Player{
             }
         }
         
-   
+   checkWall(){
+       if(this.model){
+        const rotatedVector = new Vector3(0,0,1).applyAxisAngle(new Vector3(0,1,0),this.model.rotation.y)
+        const ray = new Ray(this.model.position.clone().add(new Vector3(0,5,0)),rotatedVector)
+
+        this.raycasterWall.ray = ray
+
+        const intersection = this.raycasterWall.intersectObjects(this.sceneObjects)
+
+        if(intersection[0]){
+            if(intersection[0].distance < 50){
+                this.blockMove = true
+            }
+        }else{
+            this.blockMove = false
+        }
+       }
+   }
 }
 
 function getRotation(...value){

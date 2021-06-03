@@ -14,9 +14,8 @@ export default class DashPlayer extends Player{
         this.domElement.addEventListener("keydown", (e) => this.dash(e.keyCode))
     }
 
-    //FIXME: Może się dupcyć później ze stroną świata naprawić
     dash(code){
-       if(code == 17 && !this.blockDash){
+       if(code == 17 && !this.blockDash && !this.blockMove){
        
         if(KeyPressed.up){
             const currentPosition = this.model.position.z
@@ -24,7 +23,7 @@ export default class DashPlayer extends Player{
             new Promise((resolve, reject) =>{
                 const n = setInterval(() =>{
                     this.model.translateZ(10)
-                    if(this.model.position.z < currentPosition -150){
+                    if(this.model.position.z < currentPosition -150 || this.blockMove){
                         resolve(true)
                         this.changeDashState()
                         clearInterval(n)
@@ -40,7 +39,7 @@ export default class DashPlayer extends Player{
             new Promise((resolve, reject) =>{
                 const n = setInterval(() =>{
                     this.model.translateZ(10)
-                    if(this.model.position.z > currentPosition +150){
+                    if(this.model.position.z > currentPosition +150 || this.blockMove){
                         clearInterval(n)
                         this.changeDashState()
                         resolve()
@@ -54,7 +53,7 @@ export default class DashPlayer extends Player{
             new Promise((resolve, reject) =>{
                 const n = setInterval(() =>{
                     this.model.translateZ(10)
-                    if(this.model.position.x < currentPosition - 150){
+                    if(this.model.position.x < currentPosition - 150 || this.blockMove){
                         clearInterval(n)
                         this.changeDashState()
                         resolve()
@@ -68,7 +67,7 @@ export default class DashPlayer extends Player{
             new Promise((resolve, reject) =>{
                 const n = setInterval(() =>{
                     this.model.translateZ(10)
-                    if(this.model.position.x > currentPosition + 150){
+                    if(this.model.position.x > currentPosition + 150 || this.blockMove){
                         clearInterval(n)
                         this.changeDashState()
                         resolve()
@@ -102,6 +101,7 @@ export default class DashPlayer extends Player{
         this.movePlayer()
         this.dash()
         this.checkFloor()
+        this.checkWall()
     }
 
 }
