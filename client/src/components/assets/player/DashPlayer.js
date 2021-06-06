@@ -1,17 +1,22 @@
 import Player from "./Player";
 import KeyPressed from "./KeyPressed"
+import alberto from "../model/Alberto jump test.fbx"
+import Importer from "./Importer"
+
 
 export default class DashPlayer extends Player {
-    constructor(scene) {
-        super(scene)
+    constructor(scene,playerHelper) {
+        super(scene,playerHelper)
 
         this.blockDash = false
-
         this.initDash()
     }
 
     initDash() {
-        this.domElement.addEventListener("keydown", (e) => this.dash(e.keyCode))
+        if(!this.playerHelper){
+            this.domElement.addEventListener("keydown", (e) => this.dash(e.keyCode))
+        }
+        this.modelLoad(alberto)
     }
 
     dash(code) {
@@ -98,8 +103,16 @@ export default class DashPlayer extends Player {
         })
     }
     updatePlayer() {
+        if(this.box3){
+            this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
+        }
+        
+        const delta = this.clock.getDelta()
+        if(this.mixer){
+            this.mixer.update(delta)
+        }
+            
         this.movePlayer()
-        this.dash()
         this.checkFloor()
         this.checkWall()
     }

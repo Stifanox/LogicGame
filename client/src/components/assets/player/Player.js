@@ -1,8 +1,15 @@
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import keyMapper from "./KeyMapper"
 import KeyPressed from './KeyPressed';
-import test from "../model/rp_nathan_animated_003_walking.fbx"
-import { Ray, Raycaster, Vector3 } from 'three';
+import { Box3, Clock, Ray, Raycaster, Vector3 } from 'three';
+import Animate from './Animate';
+
+/*
+Constructor:
+@param scene: THREE.Scene
+@param playerHelper: Boolean
+*/
+
 
 /*
 Klasa Player służąca jak podstawa do tworzenia graczy na planszy. 
@@ -30,9 +37,10 @@ Player wymaga w main =>
 */
 
 //TODO: Zrobić aby model ładowały się w klasach podrzędnych 
-
 export default class Player{
-    constructor(scene) {
+    constructor(scene, playerHelper) {
+        this.clock = new Clock()
+        this.playerHelper = playerHelper
         this.blockMove = false
         this.corretion = true
         this.scene = scene
@@ -43,20 +51,25 @@ export default class Player{
         this.onSurface = true
         this.loader = new FBXLoader()
         this.model = null
+        this.box3 = null
         this.raycasterFloor = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0))
         this.raycasterWall = new Raycaster(new Vector3(0,0,0),new Vector3(0,0,-1))
         this.sceneObjects = this.scene.children
+        this.excludeMesh = ["Swap"]
+        this.mixer = null
         this.init()
     }
 
     init(){
-        this.modelLoad()
-        this.domElement.addEventListener("keydown", (e) => this.eventMapper(e.keyCode,"down"))
-        this.domElement.addEventListener("keyup", (e) => this.eventMapper(e.keyCode,"up"))
+        if(!this.playerHelper){
+            this.domElement.addEventListener("keydown", (e) => this.eventMapper(e.keyCode,"down"))
+            this.domElement.addEventListener("keyup", (e) => this.eventMapper(e.keyCode,"up"))
+        }
     }
 
     eventMapper(keyCode,origin){
             if(origin == "up"){
+                
                 switch(keyCode){
                     case keyMapper.up:
                         KeyPressed.up = false
@@ -70,10 +83,10 @@ export default class Player{
                     case keyMapper.right:
                         KeyPressed.right = false
                     break
-                    
                 }
             }
             if(origin == "down"){
+                
                 switch(keyCode){
                     case keyMapper.up:
                         KeyPressed.up = true
@@ -91,12 +104,23 @@ export default class Player{
                         KeyPressed.jump = true
                 break
                 }
+
+                switch(keyCode){
+                    case keyMapper.up:
+                    case keyMapper.down:
+                    case keyMapper.left:
+                    case keyMapper.right:
+                        this.mixer.playAnim("Armature|Run")
+                break
+                }
             } 
     }
 
    
 
     movePlayer(){
+
+
         let upDown = null
         let leftRight = null
 
@@ -115,6 +139,7 @@ export default class Player{
         if(KeyPressed.jump){
             if(!this.doneJumping){
                 this.jumpUp()
+                this.mixer.playAnim("Armature|Jump")
             }
         }
 
@@ -150,15 +175,42 @@ export default class Player{
             }
     }
     //bierze model w formacie .fbx
-    modelLoad(model = null){
-        this.loader.load(test, (obj) =>{
+    modelLoad(model){
+        this.loader.load(model, (obj) =>{
             this.scene.add(obj)
+
             this.model= obj
+
+
+            //usuwa alpha mapę dla kate (jumpPlayer) oraz oblicza boudingbox
+            if(this.model.children[0].material[1] != undefined){
+                this.model.name = "Kate"
+                console.log(this.model);
+                this.model.children[0].material[1].alphaMap = null
+                this.model.children[0].geometry.computeBoundingBox()
+                this.box3= new Box3().copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
+                this.mixer = new Animate(this.model)
+                this.mixer.playAnim("Armature|Idle")
+            }
+            else{
+                this.mixer = new Animate(this.model)
+                this.model.name = "Alberto"
+                console.log(this.model);
+                this.mixer.playAnim("Armature|Idle")
+                this.model.children[0].geometry.computeBoundingBox()
+                this.box3= new Box3().copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
+            }
+
+
             //placeholder albo nie XD
             this.model.rotation.y = Math.PI
             this.sceneObjects = this.scene.children
             this.sceneObjects = this.sceneObjects.filter(el => el != obj)
-            
+            this.sceneObjects = this.sceneObjects.filter(el =>{
+                if(!this.excludeMesh.includes(el.name)){
+                    return el
+                }
+            })
             this.createIntersection()
 
             this.model.position.set(0,500,0)
@@ -200,6 +252,7 @@ export default class Player{
                     this.jumpVelocity = 0
                     if(this.corretion){
                        this.model.position.y += 50 - intersects[0].distance
+                       this.mixer.playAnim("Armature|Idle")
                     }
                     this.corretion = false
                    }
