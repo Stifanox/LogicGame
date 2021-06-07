@@ -1,0 +1,6 @@
+import albertoDiffuse from "../../images/Ch18_1001_Diffuse.png"
+import albertoNormal from "../../images/Ch18_1001_Normal.png"
+import albertoGloss from "../../images/Ch18_1001_Glossiness.png"
+import albertoSpecular from "../../images/Ch18_1001_Specular.png"
+import kateDiffuse1 from "../../images/Ch21_1001_Diffuse.png"
+import kateDiffuse2 from "../../images/Ch21_1002_Diffuse.png"

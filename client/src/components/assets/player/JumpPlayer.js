@@ -1,8 +1,9 @@
 import Player from "./Player";
+import astra from "../model/Kate animated.fbx"
 
 export default class JumpPlayer extends Player{
-    constructor(scene) {
-        super(scene)
+    constructor(scene,playerHelper) {
+        super(scene,playerHelper)
 
         this.doubleJumpAvailable = true
 
@@ -11,7 +12,10 @@ export default class JumpPlayer extends Player{
 
 
     jumpInit(){
-        this.domElement.addEventListener("keydown", (e) => this.doubleJump(e.keyCode))
+        if(!this.playerHelper){
+            this.domElement.addEventListener("keydown", (e) => this.doubleJump(e.keyCode))
+        }
+        this.modelLoad(astra)
     }
     
     doubleJump(code){
@@ -43,8 +47,16 @@ export default class JumpPlayer extends Player{
     }
 
     updatePlayer(){
+        
+        if(this.box3){
+            this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
+        }
+        
+        if(this.mixer){
+            this.mixer.checkAnim(this.running,this.jumped)
+            this.mixer.update()
+        }
         this.movePlayer()
-        this.doubleJump()
         this.checkFloor()
         this.checkWall()
     }

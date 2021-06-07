@@ -4,12 +4,14 @@ import Camera from './Camera';
 import Floor from './floor/Floor'
 import Box from './objects/Box'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
 import DashPlayer from './assets/player/DashPlayer'
 import JumpPlayer from './assets/player/JumpPlayer'
 
 import connection from './shared/connectWithSocket'
 import dataEmit from './shared/dataEmit'
 
+import PlayerSwap from "./objects/PlayerSwap"
 
 export default class Main {
     constructor(container) {
@@ -40,7 +42,6 @@ export default class Main {
         ]
 
         this.boxes.forEach(box => {
-            console.log(box)
             let kloc = new Box(...box)
             this.scene.add(kloc)
         })
@@ -54,7 +55,6 @@ export default class Main {
 
 
 
-
         this.renderer.setClearColor(0xffffff)
         this.init();
 
@@ -65,18 +65,19 @@ export default class Main {
     async init() {
         let playerId
         this.socket = await connection(playerId)
-        console.log(this.socket);
         this.socket.on('player', (e) => {
             switch (e) {
                 case 1:
-                    this.player = new DashPlayer(this.scene)
-                    this.teamPlayer = new JumpPlayer(this.scene)
+                    this.player = new DashPlayer(this.scene,false)
+                    this.teamPlayer = new JumpPlayer(this.scene,true)
                     break;
                 case 2:
-                    this.player = new JumpPlayer(this.scene)
-                    this.teamPlayer = new DashPlayer(this.scene)
+                    this.player = new JumpPlayer(this.scene,false)
+                    this.teamPlayer = new DashPlayer(this.scene,true)
                     break;
             }
+            this.tempSwap = new PlayerSwap(this.scene)
+
             this.render();
         })
 
@@ -94,6 +95,9 @@ export default class Main {
             })
         }
         this.player.updatePlayer()
+        if(this.player.model && this.teamPlayer.model){
+            this.tempSwap.checkForSwap(this.player,this.teamPlayer)
+        }
         this.renderer.render(this.scene, this.camera);
 
         requestAnimationFrame(this.render.bind(this));
