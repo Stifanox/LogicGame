@@ -51,11 +51,11 @@ export default class JumpPlayer extends Player{
         if(this.box3){
             this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
         }
-        const delta = this.clock.getDelta()
-if(this.mixer){
-    this.mixer.update(delta)
-
-}
+        
+        if(this.mixer){
+            this.mixer.checkAnim(this.running,this.jumped)
+            this.mixer.update()
+        }
         this.movePlayer()
         this.checkFloor()
         this.checkWall()

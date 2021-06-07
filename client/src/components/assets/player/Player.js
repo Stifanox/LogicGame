@@ -1,7 +1,7 @@
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import keyMapper from "./KeyMapper"
 import KeyPressed from './KeyPressed';
-import { Box3, Clock, Ray, Raycaster, Vector3 } from 'three';
+import { Box3, Ray, Raycaster, Vector3 } from 'three';
 import Animate from './Animate';
 
 /*
@@ -39,7 +39,9 @@ Player wymaga w main =>
 //TODO: Zrobić aby model ładowały się w klasach podrzędnych 
 export default class Player{
     constructor(scene, playerHelper) {
-        this.clock = new Clock()
+        //Animacja
+        this.running = false
+        //Animacja
         this.playerHelper = playerHelper
         this.blockMove = false
         this.corretion = true
@@ -84,6 +86,10 @@ export default class Player{
                         KeyPressed.right = false
                     break
                 }
+
+                if(!KeyPressed.right && !KeyPressed.left && !KeyPressed.down && !KeyPressed.up){
+                    this.running = false
+                }
             }
             if(origin == "down"){
                 
@@ -105,13 +111,8 @@ export default class Player{
                 break
                 }
 
-                switch(keyCode){
-                    case keyMapper.up:
-                    case keyMapper.down:
-                    case keyMapper.left:
-                    case keyMapper.right:
-                        this.mixer.playAnim("Armature|Run")
-                break
+                if(KeyPressed.right || KeyPressed.left || KeyPressed.down || KeyPressed.up){
+                    this.running = true
                 }
             } 
     }
@@ -119,8 +120,6 @@ export default class Player{
    
 
     movePlayer(){
-
-
         let upDown = null
         let leftRight = null
 
@@ -139,7 +138,6 @@ export default class Player{
         if(KeyPressed.jump){
             if(!this.doneJumping){
                 this.jumpUp()
-                this.mixer.playAnim("Armature|Jump")
             }
         }
 
@@ -180,23 +178,17 @@ export default class Player{
             this.scene.add(obj)
 
             this.model= obj
-
+            this.model.name = "playerModel"
 
             //usuwa alpha mapę dla kate (jumpPlayer) oraz oblicza boudingbox
             if(this.model.children[0].material[1] != undefined){
-                this.model.name = "Kate"
-                console.log(this.model);
                 this.model.children[0].material[1].alphaMap = null
                 this.model.children[0].geometry.computeBoundingBox()
                 this.box3= new Box3().copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
                 this.mixer = new Animate(this.model)
-                this.mixer.playAnim("Armature|Idle")
             }
             else{
                 this.mixer = new Animate(this.model)
-                this.model.name = "Alberto"
-                console.log(this.model);
-                this.mixer.playAnim("Armature|Idle")
                 this.model.children[0].geometry.computeBoundingBox()
                 this.box3= new Box3().copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
             }
@@ -252,7 +244,6 @@ export default class Player{
                     this.jumpVelocity = 0
                     if(this.corretion){
                        this.model.position.y += 50 - intersects[0].distance
-                       this.mixer.playAnim("Armature|Idle")
                     }
                     this.corretion = false
                    }
