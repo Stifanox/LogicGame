@@ -7,6 +7,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import DashPlayer from './assets/player/DashPlayer'
 import JumpPlayer from './assets/player/JumpPlayer'
+import JumpTeamPlayer from './assets/player/JumpTeamPlayer'
+import DashTeamPlayer from './assets/player/DashTeamPlayer'
 
 import connection from './shared/connectWithSocket'
 import dataEmit from './shared/dataEmit'
@@ -68,12 +70,12 @@ export default class Main {
         this.socket.on('player', (e) => {
             switch (e) {
                 case 1:
-                    this.player = new DashPlayer(this.scene,false)
-                    this.teamPlayer = new JumpPlayer(this.scene,true)
+                    this.player = new DashPlayer(this.scene, false)
+                    this.teamPlayer = new JumpTeamPlayer(this.scene)
                     break;
                 case 2:
-                    this.player = new JumpPlayer(this.scene,false)
-                    this.teamPlayer = new DashPlayer(this.scene,true)
+                    this.player = new JumpPlayer(this.scene, false)
+                    this.teamPlayer = new DashTeamPlayer(this.scene)
                     break;
             }
             this.tempSwap = new PlayerSwap(this.scene)
@@ -95,8 +97,8 @@ export default class Main {
             })
         }
         this.player.updatePlayer()
-        if(this.player.model && this.teamPlayer.model){
-            this.tempSwap.checkForSwap(this.player,this.teamPlayer)
+        if (this.player.model && this.teamPlayer.model) {
+            this.tempSwap.checkForSwap(this.player, this.teamPlayer)
         }
         this.renderer.render(this.scene, this.camera);
 
