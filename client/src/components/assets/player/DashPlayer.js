@@ -9,6 +9,7 @@ export default class DashPlayer extends Player {
         super(scene,playerHelper)
 
         this.blockDash = false
+        this.dashDistance = 200
         this.initDash()
     }
 
@@ -28,7 +29,7 @@ export default class DashPlayer extends Player {
                 new Promise((resolve, reject) => {
                     const n = setInterval(() => {
                         this.model.translateZ(10)
-                        if (this.model.position.z < currentPosition - 150 || this.blockMove) {
+                        if (this.model.position.z < currentPosition - this.dashDistance || this.blockMove) {
                             resolve(true)
                             this.changeDashState()
                             clearInterval(n)
@@ -44,7 +45,7 @@ export default class DashPlayer extends Player {
                 new Promise((resolve, reject) => {
                     const n = setInterval(() => {
                         this.model.translateZ(10)
-                        if (this.model.position.z > currentPosition + 150 || this.blockMove) {
+                        if (this.model.position.z > currentPosition + this.dashDistance || this.blockMove) {
                             clearInterval(n)
                             this.changeDashState()
                             resolve()
@@ -58,7 +59,7 @@ export default class DashPlayer extends Player {
                 new Promise((resolve, reject) => {
                     const n = setInterval(() => {
                         this.model.translateZ(10)
-                        if (this.model.position.x < currentPosition - 150 || this.blockMove) {
+                        if (this.model.position.x < currentPosition - this.dashDistance || this.blockMove) {
                             clearInterval(n)
                             this.changeDashState()
                             resolve()
@@ -72,7 +73,7 @@ export default class DashPlayer extends Player {
                 new Promise((resolve, reject) => {
                     const n = setInterval(() => {
                         this.model.translateZ(10)
-                        if (this.model.position.x > currentPosition + 150 || this.blockMove) {
+                        if (this.model.position.x > currentPosition + this.dashDistance || this.blockMove) {
                             clearInterval(n)
                             this.changeDashState()
                             resolve()
