@@ -7,11 +7,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import DashPlayer from './assets/player/DashPlayer'
 import JumpPlayer from './assets/player/JumpPlayer'
+import DashTeamPlayer from "./assets/player/DashTeamPlayer"
+import JumpTeamPlayer from "./assets/player/JumpTeamPlayer"
 
 import connection from './shared/connectWithSocket'
 import dataEmit from './shared/dataEmit'
 
-import PlayerSwap from "./objects/PlayerSwap"
+import Button from './objects/Button';
+import Door from './objects/Door';
+import Platform from './objects/Platform';
 
 export default class Main {
     constructor(container) {
@@ -37,7 +41,7 @@ export default class Main {
         this.boxes = [
             // [x (tak jak podłoga), y (na czym ma leżeć box), z (tak jak podłoga), rozmiar w px, rotacja w czymkolwiek chcesz],
             [1, 0, 1, 100, 1],
-            [3, 0, 4, 100, 2],
+            [3, 70, 4, 100, 2],
             [1, 100, 1, 50, 0],
         ]
 
@@ -53,6 +57,7 @@ export default class Main {
         this.planeMesh.rotation.x += Math.PI / 2
         this.scene.add(this.planeMesh)
 
+        
 
 
         this.renderer.setClearColor(0xffffff)
@@ -69,14 +74,17 @@ export default class Main {
             switch (e) {
                 case 1:
                     this.player = new DashPlayer(this.scene,false)
-                    this.teamPlayer = new JumpPlayer(this.scene,true)
+                    this.teamPlayer = new JumpTeamPlayer(this.scene,true)
+                    this.door = new Door(1,2,3,this.scene)
+                    this.button = new Button(3,2,1,this.scene,this.door,this.player)
                     break;
                 case 2:
                     this.player = new JumpPlayer(this.scene,false)
-                    this.teamPlayer = new DashPlayer(this.scene,true)
+                    this.teamPlayer = new DashTeamPlayer(this.scene)
+                    this.door = new Door(1,2,3,this.scene)
+                    this.button = new Button(3,2,1,this.scene,this.door,this.player)
                     break;
             }
-            this.tempSwap = new PlayerSwap(this.scene)
 
             this.render();
         })
@@ -92,12 +100,15 @@ export default class Main {
             this.socket.on("position", (e) => {
                 this.teamPlayer.model.position.set(e.pos.x, e.pos.y, e.pos.z)
                 this.teamPlayer.model.rotation.y = e.rot
+               
             })
+            this.teamPlayer.mixer.checkAnim(this.teamPlayer.running,this.teamPlayer.jumped)
+            this.teamPlayer.mixer.update()
         }
+        
         this.player.updatePlayer()
-        if(this.player.model && this.teamPlayer.model){
-            this.tempSwap.checkForSwap(this.player,this.teamPlayer)
-        }
+        this.button.checkAction()
+        this.door.changeDoorState()
         this.renderer.render(this.scene, this.camera);
 
         requestAnimationFrame(this.render.bind(this));
