@@ -55,7 +55,8 @@ export default class Player{
         this.model = null
         this.box3 = null
         this.raycasterFloor = new Raycaster(new Vector3(0,0,0),new Vector3(0,-1,0))
-        this.raycasterWall = new Raycaster(new Vector3(0,0,0),new Vector3(0,0,-1))
+        this.raycasterWallUp = new Raycaster(new Vector3(0,0,0),new Vector3(0,0,-1))
+        this.raycasterWallDown = new Raycaster(new Vector3(0,0,0),new Vector3(0,0,-1))
         this.sceneObjects = this.scene.children
         this.excludeMesh = ["Swap"]
         this.mixer = null
@@ -258,14 +259,17 @@ export default class Player{
    checkWall(){
        if(this.model){
         const rotatedVector = new Vector3(0,0,1).applyAxisAngle(new Vector3(0,1,0),this.model.rotation.y)
-        const ray = new Ray(this.model.position.clone().add(new Vector3(0,5,0)),rotatedVector)
+        const rayDown = new Ray(this.model.position.clone().add(new Vector3(0,5,0)),rotatedVector)
+        const rayUp = new Ray(this.model.position.clone().add(new Vector3(0,120,0)),rotatedVector)
 
-        this.raycasterWall.ray = ray
+        this.raycasterWallUp.ray = rayUp
+        this.raycasterWallDown.ray = rayDown
 
-        const intersection = this.raycasterWall.intersectObjects(this.sceneObjects)
+        const intersectionDown = this.raycasterWallDown.intersectObjects(this.sceneObjects)
+        const intersectionUp = this.raycasterWallUp.intersectObjects(this.sceneObjects)
 
-        if(intersection[0]){
-            if(intersection[0].distance < 50){
+        if(intersectionDown[0] || intersectionUp[0]){
+            if( (intersectionDown[0] != undefined && intersectionDown[0].distance < 50) || (intersectionUp[0] != undefined && intersectionUp[0].distance < 50)){
                 this.blockMove = true
             }
         }else{
