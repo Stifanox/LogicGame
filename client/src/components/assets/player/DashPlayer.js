@@ -5,8 +5,8 @@ import Importer from "./Importer"
 
 
 export default class DashPlayer extends Player {
-    constructor(scene,playerHelper) {
-        super(scene,playerHelper)
+    constructor(scene, manager) {
+        super(scene, manager)
 
         this.blockDash = false
         this.dashDistance = 200
@@ -14,9 +14,7 @@ export default class DashPlayer extends Player {
     }
 
     initDash() {
-        if(!this.playerHelper){
-            this.domElement.addEventListener("keydown", (e) => this.dash(e.keyCode))
-        }
+        this.domElement.addEventListener("keydown", (e) => this.dash(e.keyCode))
         this.modelLoad(alberto)
     }
 
@@ -104,12 +102,12 @@ export default class DashPlayer extends Player {
         })
     }
     updatePlayer() {
-        if(this.box3){
+        if (this.box3) {
             this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
         }
-        
-        if(this.mixer){
-            this.mixer.checkAnim(this.running,this.jumped)
+
+        if (this.mixer) {
+            this.mixer.checkAnim(this.running, this.jumped)
             this.mixer.update()
         }
         this.movePlayer()

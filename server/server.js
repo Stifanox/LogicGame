@@ -32,6 +32,12 @@ io.use((socket, next) => {
     sessionMiddleware(socket.request, {}, next)
 })
 
+app.use(express.static("dist"))
+
+app.get("/", function (req, res) {
+    res.sendFile(__dirname + "/dist/index.html")
+})
+
 //Wywołanie funkcji do przydzielania pokojów
 app.get('/handleUser', function (req, res) {
     const data = handleUser(gameRooms)
