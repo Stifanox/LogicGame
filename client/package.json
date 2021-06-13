@@ -23,6 +23,7 @@
   },
   "scripts": {
     "go": "webpack && webpack serve --open",
+    "express": "node ../server/server.js",
     "build": "webpack",
     "watch": "webpack --progress --watch",
     "server": "webpack serve --open"

@@ -5,14 +5,23 @@ export default function connection(id) {
     const socket = io('http://localhost:3000')
     return new Promise((resolve, reject) => {
         socket.on('connect', function () {
-            fetch("http://localhost:3000/handleUser", {
-                method: "GET",
-            }).then(res => res.json()).then(res => {
-                socket.emit('join', res.room)
-                //res składa się z roomu, który jest id pokoju i tmpuser który jest numerem gracza czyli instrukcją do renderowania playerów
-                socket.emit('player', res.tmpuser)
+            console.log(sessionStorage)
+            if (!sessionStorage.getItem('room')) {
+                fetch("http://localhost:3000/handleUser", {
+                    method: "GET",
+                }).then(res => res.json()).then(res => {
+                    sessionStorage.setItem("room", res.room)
+                    sessionStorage.setItem("player", res.player)
+                    socket.emit('join', res.room)
+                    //res składa się z roomu, który jest id pokoju i tmpuser który jest numerem gracza czyli instrukcją do renderowania playerów
+                    socket.emit('player', res.player)
+                    resolve(socket)
+                })
+            } else {
+                socket.emit('join', sessionStorage.getItem("room"))
+                socket.emit('player', sessionStorage.getItem('player'))
                 resolve(socket)
-            })
+            }
         })
     })
 

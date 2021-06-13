@@ -1,4 +1,5 @@
-const app = require('express')();
+const express = require('express')
+const app = express();
 const http = require('http').Server(app);
 const cors = require('cors')
 const io = require('socket.io')(http,
@@ -9,9 +10,13 @@ const io = require('socket.io')(http,
         }
     });
 const session = require('express-session')
-//const sharedsession = require('express-socket.io-session')
 const cookieParser = require('cookie-parser')
 app.use(cors())
+app.use(
+    express.urlencoded({
+        extended: true,
+    })
+);
 
 //TODO: Naprawić sesje
 
@@ -21,19 +26,22 @@ const handleUser = require('./components/handleUser').handleUser
 
 app.use(cookieParser())
 
-const sessionMiddleware = session({ secret: 'secret', saveUninitialized: true, resave: true })
+const sessionMiddleware = session({ secret: 'sheeesh', saveUninitialized: true, resave: true })
 app.use(sessionMiddleware)
 io.use((socket, next) => {
     sessionMiddleware(socket.request, {}, next)
 })
 
+app.use(express.static("dist"))
+
+app.get("/", function (req, res) {
+    res.sendFile(__dirname + "/dist/index.html")
+})
+
 //Wywołanie funkcji do przydzielania pokojów
 app.get('/handleUser', function (req, res) {
-    if (!req.session.room) {
-        handleUser(gameRooms, req.session)
-    }
-    console.log(req.session.room)
-    res.end(JSON.stringify({ room: req.session.room, tmpuser: req.session.player }))
+    const data = handleUser(gameRooms)
+    res.end(JSON.stringify(data))
 })
 
 
