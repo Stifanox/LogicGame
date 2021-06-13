@@ -29,8 +29,6 @@ export default class PlayerSwap extends Mesh{
 
                 player.model.position.set(teamPlayerPos.x,teamPlayerPos.y,teamPlayerPos.z)
                 
-                console.log(player.model.position,playerPos,teamPlayerPos);
-
                 teamPlayer.model.position.set(playerPos.x,playerPos.y,playerPos.z)
 
 
