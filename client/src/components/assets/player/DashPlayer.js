@@ -9,7 +9,7 @@ export default class DashPlayer extends Player {
         super(scene, manager)
 
         this.blockDash = false
-        this.dashDistance = 200
+        this.dashDistance = 300
         this.initDash()
     }
 
@@ -113,6 +113,7 @@ export default class DashPlayer extends Player {
         this.movePlayer()
         this.checkFloor()
         this.checkWall()
+        this.checkCelling()
     }
 
 }

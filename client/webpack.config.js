@@ -7,13 +7,13 @@ module.exports = {
     },
     output: {
         filename: '[name].js',
-        path: path.resolve(__dirname + "/../server/dist")
+        // path: path.resolve(__dirname + "/../server/dist")
     },
     devtool: "source-map",
     mode: 'development', // none, development, production
     devServer: {
-        open: true,
-        openPage: "http://localhost:3000",
+        // open: true,
+        // openPage: "http://localhost:3000",
         port: 8080
     },
     plugins: [

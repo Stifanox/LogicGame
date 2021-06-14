@@ -1,16 +1,24 @@
 import { Box3, CylinderGeometry, Mesh, MeshBasicMaterial } from "three"
 
 export default class Button extends Mesh{
-    constructor(posX,posY,posZ,scene,bindObject,player) {
+    constructor(posX,posY,posZ,scene,bindObject,player,teamPlayer) {
         super(new CylinderGeometry(50,50,20,30,1),new MeshBasicMaterial({color:0xff0000}))
-        this.position.set(posX*100-50,posY*50+10,posZ*100-50)
+        this.position.set(posX,posY,posZ)
+        this.x = posX
         this.player = player
+        this.teamPlayer = teamPlayer
         this.geometry.computeBoundingBox()
         this.box3 = new Box3()
         this.bindObject = bindObject
         this.scene = scene
-
+        this.state = null
         this.scene.add(this)
+
+        if(this.bindObject.name == "Door"){
+            this.state = false
+            this.bindObject.addBind()
+            this.bindIndex = this.bindObject.getBindIndex()
+        }
     }
 
     checkAction(){
@@ -19,21 +27,32 @@ export default class Button extends Mesh{
         switch(this.bindObject.name){
             case "Platform":
                 if(this.player.box3){
-                    if(this.box3.intersectsBox(this.player.box3)){
-                        this.bindObject.enable = false
+                    if(this.box3.intersectsBox(this.player.box3) || this.box3.intersectsBox(this.teamPlayer.box3)){
+                        if(!this.bindObject.type){
+                            this.bindObject.setEnable(true)
+                        }
+                        else{
+                            this.bindObject.setEnable(false)
+                        }
                     }else{
-                        this.bindObject.enable = true
+                        if(!this.bindObject.type){
+                            this.bindObject.setEnable(false)
+                        }
+                        else{
+                            this.bindObject.setEnable(true)
+                        }
                     }
                 }
             break
 
             case "Door":
                 if(this.player.box3){
-                    if(this.box3.intersectsBox(this.player.box3)){
-                        this.bindObject.enable = true
+                    if(this.box3.intersectsBox(this.player.box3) || this.box3.intersectsBox(this.teamPlayer.box3)){
+                        this.state = true
                     }else{
-                        this.bindObject.enable = false
+                        this.state = false
                     }
+                    this.bindObject.setEnable(this.state,this.bindIndex)
                 }
         }
         

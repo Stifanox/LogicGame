@@ -21,7 +21,8 @@ app.use(
 //TODO: Naprawić sesje
 
 var gameRooms = []
-const handleUser = require('./components/handleUser').handleUser
+const handleUser = require('./components/handleUser').handleUser;
+const { type } = require('os');
 
 
 app.use(cookieParser())
@@ -61,6 +62,10 @@ io.on('connection', function (socket) {
     })
     socket.on('disconnect', function () {
         console.log('A user disconnected');
+    });
+    socket.on('joined', function(e){
+            socket.in(socket.request.session.room).emit('gameStart', true)
+            socket.emit("gameStart",true)
     });
 });
 

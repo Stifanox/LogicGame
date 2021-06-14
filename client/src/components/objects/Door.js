@@ -6,16 +6,16 @@ export default class Door extends Mesh{
         super(new BoxGeometry(500,500,30), new MeshBasicMaterial({color:0x523c02,side:DoubleSide}))
         this.scene = scene
         this.rotation.y = Math.PI /2
-        this.position.set(50,250,100)
+        this.position.set(posX,300,posZ)
         this.scene.add(this)
         this.name = "Door"
-        this.enable = false
         this.ceiling = 700
-        this.floor =  250
+        this.floor =  299
+        this.buttonBinded = []
     }
 
     changeDoorState(){
-        if(!this.enable){
+        if(!this.buttonBinded.includes(true)){
             if(this.position.y > this.floor){
                 this.translateY(-2)
             }
@@ -26,5 +26,19 @@ export default class Door extends Mesh{
             }
         }
     }
+    getEnable(){
+        return this.enable
+    }
 
+    setEnable(enable,index){
+        this.buttonBinded[index] = enable
+    }
+
+    addBind(){
+        this.buttonBinded.push(false)
+    }
+
+    getBindIndex(){
+        return this.buttonBinded.length-1
+    }
 }

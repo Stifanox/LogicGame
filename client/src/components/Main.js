@@ -1,4 +1,4 @@
-import { Scene, Vector3, GridHelper, PlaneGeometry, MeshBasicMaterial, Mesh, DoubleSide, AmbientLight } from 'three';
+import { Scene, Vector3, GridHelper, PlaneGeometry, MeshBasicMaterial, Mesh, DoubleSide, AmbientLight, LoadingManager } from 'three';
 import Renderer from './Renderer';
 import Camera from './Camera';
 import Floor from './floor/Floor'
@@ -7,22 +7,45 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import DashPlayer from './assets/player/DashPlayer'
 import JumpPlayer from './assets/player/JumpPlayer'
-import DashTeamPlayer from "./assets/player/DashTeamPlayer"
-import JumpTeamPlayer from "./assets/player/JumpTeamPlayer"
+import JumpTeamPlayer from './assets/player/JumpTeamPlayer'
+import DashTeamPlayer from './assets/player/DashTeamPlayer'
+
+import Spikes from './objects/Spikes';
+import Platform from './objects/Platform';
+import Button from "./objects/Button"
+import Door from "./objects/Door"
+import ButtonWin from "./objects/ButtonWin"
 
 import connection from './shared/connectWithSocket'
 import dataEmit from './shared/dataEmit'
 
-import Button from './objects/Button';
-import Door from './objects/Door';
-import Platform from './objects/Platform';
 
 export default class Main {
-    constructor(container) {
+    constructor(container, loadingScreen, loadingAnim, playerInfo) {
+        //Divy z loadingiem
+        this.loadingScreen = loadingScreen
+        this.loadingAnim = loadingAnim
+        this.playerInfo = playerInfo
+        this.loading = true
+        console.log("klasa", this.loadingAnim)
+        let helpCounter = 0
+        this.loadingAnimation = setInterval(() => {
+            this.loadingAnim.innerText = "Loading in progress" + ".".repeat(helpCounter)
+            console.log(helpCounter)
+            if (helpCounter == 3) {
+                helpCounter = 0
+            } else {
+                helpCounter++
+            }
+        }, 200)
+        this.manager = new LoadingManager()
         this.container = container;
         this.scene = new Scene();
         this.renderer = new Renderer(container);
         this.camera = new Camera(75, window.screen.width, window.screen.height);
+
+        //Zmienna do sprawdzenia czy oboje graczy się załadowało
+        this.gameStart = false
 
         const gridHelper = new GridHelper(3000, 30);
         this.scene.add(gridHelper);
@@ -31,18 +54,25 @@ export default class Main {
 
         //Wywołanie podłogi
         this.floorInstructions = {
-            size: "10x5",
+            size: "15x5",
             holes: true,
-            holePos: ["5/3x5/5", "7/3x8/5"]
+            holePos: ["6/1x12/5",],
+            levelY:0,
         }
-        this.floor = new Floor(this.floorInstructions, this.camera, this.scene)
+        this.floorInstructions2 = {
+            size: "15x5",
+            holes: true,
+            holePos: ["6/1x12/5",],
+            levelY:500,
+        }
 
+        this.floor = new Floor(this.floorInstructions, this.camera, this.scene)
+        
+        this.floor2 = new Floor(this.floorInstructions2, this.camera, this.scene)
         //propy boxów
         this.boxes = [
             // [x (tak jak podłoga), y (na czym ma leżeć box), z (tak jak podłoga), rozmiar w px, rotacja w czymkolwiek chcesz],
-            [1, 0, 1, 100, 1],
-            [3, 70, 4, 100, 2],
-            [1, 100, 1, 50, 0],
+          
         ]
 
         this.boxes.forEach(box => {
@@ -57,8 +87,7 @@ export default class Main {
         this.planeMesh.rotation.x += Math.PI / 2
         this.scene.add(this.planeMesh)
 
-        
-
+        this.platform = null
 
         this.renderer.setClearColor(0xffffff)
         this.init();
@@ -66,51 +95,101 @@ export default class Main {
 
 
     }
-    //Wywołanie graczy zależne od responsa z serewera i przypisaanie socketu do zmiennej
+    //Wywołanie graczy zależne od responsa z serwera i przypisaanie socketu do zmiennej
     async init() {
         let playerId
         this.socket = await connection(playerId)
-        this.socket.on('player', (e) => {
-            switch (e) {
-                case 1:
-                    this.player = new DashPlayer(this.scene,false)
-                    this.teamPlayer = new JumpTeamPlayer(this.scene,true)
-                    this.door = new Door(1,2,3,this.scene)
-                    this.button = new Button(3,2,1,this.scene,this.door,this.player)
-                    break;
-                case 2:
-                    this.player = new JumpPlayer(this.scene,false)
-                    this.teamPlayer = new DashTeamPlayer(this.scene)
-                    this.door = new Door(1,2,3,this.scene)
-                    this.button = new Button(3,2,1,this.scene,this.door,this.player)
-                    break;
-            }
 
-            this.render();
+        this.scene.children.forEach(child => {
+            if (child.name == "playerModel") {
+                child.removeFromParent()
+            }
         })
+        switch (sessionStorage.getItem("player")) {
+            case "1":
+                this.playerInfo.innerText = "You are 1st player - Alberto"
+                this.player = new DashPlayer(this.scene, this.manager)
+                this.teamPlayer = new JumpTeamPlayer(this.scene)
+
+                this.platform = new Platform(100,2,100,1,this.scene,"X",this.player,true)
+                this.platform2 = new Platform(-250,2,-100,1,this.scene,"Y",this.player,true)
+                this.button = new Button(-650,50,-200,this.scene,this.platform,this.player,this.teamPlayer)
+                this.door = new Door(-300,100,0,this.scene)
+                this.button2 = new Button(-500,50,-200,this.scene,this.door,this.player,this.teamPlayer)
+                this.button3= new Button(600,60,100,this.scene,this.platform2,this.player,this.teamPlayer)
+                this.button4 = new Button(600,50,-250,this.scene,this.door,this.player,this.teamPlayer)
+                this.spikes = new Spikes(100,0,0,this.scene,this.player)
+                this.buttonWin = new ButtonWin(-650,550,-200,this.scene,this.player,this.teamPlayer)
+                break;
+            case "2":
+                this.playerInfo.innerText = "You are 2nd player - Kate"
+                this.player = new JumpPlayer(this.scene, this.manager)
+                this.teamPlayer = new DashTeamPlayer(this.scene)
+
+                this.platform = new Platform(100,2,100,1,this.scene,"X",this.player,true)
+                this.platform2 = new Platform(-250,2,-150,1,this.scene,"Y",this.player,true)
+                this.button = new Button(-650,50,-200,this.scene,this.platform,this.player,this.teamPlayer)
+                this.door = new Door(-300,100,0,this.scene)
+                this.button2 = new Button(-500,50,-200,this.scene,this.door,this.player,this.teamPlayer)
+                this.button3= new Button(600,60,100,this.scene,this.platform2,this.player,this.teamPlayer)
+                this.button4 = new Button(600,50,-250,this.scene,this.door,this.player,this.teamPlayer)
+                this.spikes = new Spikes(100,0,0,this.scene,this.player)
+                this.buttonWin = new ButtonWin(-650,550,-200,this.scene,this.player,this.teamPlayer)
+                break;
+        }
+        this.manager.onLoad = () => {
+            
+            if(sessionStorage.getItem("player") == "2"){
+                dataEmit(this.socket,sessionStorage.getItem("player"),"joined")
+            }
+        }
+        
+        this.socket.on("gameStart", e =>{
+            this.loadingScreen.style.display = "none"
+            clearInterval(this.loadingAnimation)
+            this.gameStart = true
+        })
+       
+
+        this.render();
 
     }
 
     render() {
-        //Emitowanie i przyjmowanie danych o pozycji teammate'a i jego rotacji
-        if (this.player.model) {
-            dataEmit(this.socket, { pos: this.player.model.position, rot: this.player.model.rotation.y })
-        }
+        if(this.gameStart){
+            if (this.player.model)
+            //Emitowanie i przyjmowanie danych o pozycji teammate'a i jego rotacji
+            if (this.player.model) {
+                dataEmit(this.socket, { pos: this.player.model.position, rot: this.player.model.rotation.y, animations: [this.player.running, this.player.jumped] },"position")
+            }
         if (this.teamPlayer.model) {
             this.socket.on("position", (e) => {
                 this.teamPlayer.model.position.set(e.pos.x, e.pos.y, e.pos.z)
                 this.teamPlayer.model.rotation.y = e.rot
-               
+                this.teamPlayer.mixer.checkAnim(e.animations[0], e.animations[1])
             })
-            this.teamPlayer.mixer.checkAnim(this.teamPlayer.running,this.teamPlayer.jumped)
             this.teamPlayer.mixer.update()
         }
-        
         this.player.updatePlayer()
+        this.teamPlayer.updateBox()
+
+        //FIXME:TEMP
         this.button.checkAction()
+        this.platform.move()
+
+        this.platform2.move()
+        this.button2.checkAction()
+        this.button3.checkAction()
+        this.button4.checkAction()
         this.door.changeDoorState()
+        this.spikes.checkForCollision()
+        this.buttonWin.checkWin()
+        //FIXME: TEMP
         this.renderer.render(this.scene, this.camera);
 
+        }
+            
         requestAnimationFrame(this.render.bind(this));
+       
     }
 }

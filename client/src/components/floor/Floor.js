@@ -14,6 +14,7 @@ export default class Floor extends Group {
     //}
     constructor(instructions, camera, scene) {
         super()
+        this.instructions = instructions
         this.scene = scene
         this.boxes = []
         this.init(instructions, camera)
@@ -108,7 +109,7 @@ export default class Floor extends Group {
         this.boxesToCreate.forEach(box => {
             let tempOffX = this.offsetX + (box.size - 1) * 50
             let tempOffZ = this.offsetZ + (box.size - 1) * 50
-            this.add(new BaseBlock(tempOffX + (box.x * 100), 0, tempOffZ + (box.z * 100), box.size))
+            this.add(new BaseBlock(tempOffX + (box.x * 100), this.instructions.levelY, tempOffZ + (box.z * 100), box.size))
         })
         this.scene.add(this)
     }

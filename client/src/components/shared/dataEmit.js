@@ -1,4 +1,4 @@
-export default function dataEmit(socket, data) {
+export default function dataEmit(socket, data, name) {
     //Emitowanie danych do pokoju co render
-    socket.emit("position", data)
+    socket.emit(name, data)
 }

@@ -1,5 +1,6 @@
 import Player from "./Player";
 import astra from "../model/Kate animated.fbx"
+import alberto from "../model/Alberto jump test.fbx"
 
 export default class JumpPlayer extends Player {
     constructor(scene, manager) {
@@ -13,7 +14,7 @@ export default class JumpPlayer extends Player {
 
     jumpInit() {
         this.domElement.addEventListener("keydown", (e) => this.doubleJump(e.keyCode))
-        this.modelLoad(astra)
+        this.modelLoad(alberto)
     }
 
     doubleJump(code) {
@@ -57,5 +58,6 @@ export default class JumpPlayer extends Player {
         this.movePlayer()
         this.checkFloor()
         this.checkWall()
+        this.checkCelling()
     }
 }
