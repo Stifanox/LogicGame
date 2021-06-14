@@ -1,6 +1,9 @@
 import { Box3, DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry } from "three";
 
 //TODO:Zrobić dynamiczne ustawianie obiektów
+
+//type: true -> wchodzi na przycisk i się porusza
+//type: false -> wchodzisz na przycisk i się nie porusza
 export default class Platform extends Mesh{
     constructor(posX,posY,posZ,size,scene,movingAxis,player,type) {
         super(new PlaneGeometry(200*size,200*size),new MeshBasicMaterial({side:DoubleSide,color:0xf2a3d4}))
@@ -18,6 +21,8 @@ export default class Platform extends Mesh{
         this.name = "Platform"
         this.floor = 50
         this.celling = 500        
+        this.buttonBinded = []
+        
         if(!this.type){
             this.block = false
         }
@@ -67,10 +72,37 @@ export default class Platform extends Mesh{
         
         this.box3.copy(this.geometry.boundingBox).applyMatrix4(this.matrixWorld)
         
+        if(!this.type){
+            if(this.buttonBinded.includes(false)){
+                this.block = false
+            }else{
+                this.block = true
+            }
+        }
+        else{
+            if(this.buttonBinded.includes(true)){
+                this.block = false
+            }else{
+                this.block = true
+            }
+        }
     }
 
 
-    setEnable(block){
-        this.block = block
+    setEnable(enable,index){
+       this.buttonBinded[index] = enable
+    }
+
+    addBind(){
+        if(!this.type){
+            this.buttonBinded.push(true)
+        }
+        else{
+            this.buttonBinded.push(false)
+        }
+    }
+
+    getBindIndex(){
+        return this.buttonBinded.length - 1
     }
 }
