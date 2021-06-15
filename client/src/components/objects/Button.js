@@ -19,6 +19,20 @@ export default class Button extends Mesh {
             this.bindObject.addBind()
             this.bindIndex = this.bindObject.getBindIndex()
         }
+        if (this.bindObject.name == "Platform") {
+            if (!this.bindObject.type) {
+                this.state = true
+                this.bindObject.addBind()
+                this.bindIndex = this.bindObject.getBindIndex()
+                console.log(this.bindIndex);
+            }
+            else {
+                this.state = false
+                this.bindObject.addBind()
+                this.bindIndex = this.bindObject.getBindIndex()
+                console.log(this.bindIndex);
+            }
+        }
     }
 
     checkAction() {
@@ -29,18 +43,20 @@ export default class Button extends Mesh {
                 if (this.player.box3) {
                     if (this.box3.intersectsBox(this.player.box3) || this.box3.intersectsBox(this.teamPlayer.box3)) {
                         if (!this.bindObject.type) {
-                            this.bindObject.setEnable(true)
+                            this.state = false
                         }
                         else {
-                            this.bindObject.setEnable(false)
+                            this.state = true
                         }
+                        this.bindObject.setEnable(this.state, this.bindIndex)
                     } else {
                         if (!this.bindObject.type) {
-                            this.bindObject.setEnable(false)
+                            this.state = true
                         }
                         else {
-                            this.bindObject.setEnable(true)
+                            this.state = false
                         }
+                        this.bindObject.setEnable(this.state, this.bindIndex)
                     }
                 }
                 break
@@ -52,6 +68,8 @@ export default class Button extends Mesh {
                     } else {
                         this.state = false
                     }
+                    //buton 1 -> index 0 state: false
+                    //buton 2 -> index 1 state: false
                     this.bindObject.setEnable(this.state, this.bindIndex)
                 }
         }
