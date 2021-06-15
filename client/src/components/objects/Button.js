@@ -24,13 +24,11 @@ export default class Button extends Mesh {
                 this.state = true
                 this.bindObject.addBind()
                 this.bindIndex = this.bindObject.getBindIndex()
-                console.log(this.bindIndex);
             }
             else{
                 this.state = false
                 this.bindObject.addBind()
                 this.bindIndex = this.bindObject.getBindIndex()
-                console.log(this.bindIndex);
             }
         }
     }
@@ -40,20 +38,21 @@ export default class Button extends Mesh {
 
         switch (this.bindObject.name) {
             case "Platform":
-                if (this.player.box3) {
-                    if (this.box3.intersectsBox(this.player.box3) || this.box3.intersectsBox(this.teamPlayer.box3)) {
-                        if (!this.bindObject.type) {
-                            this.bindObject.setEnable(true)
+                if(this.player.box3){
+                    if(this.box3.intersectsBox(this.player.box3) || this.box3.intersectsBox(this.teamPlayer.box3)){
+                        if(!this.bindObject.type){
+                            this.state = false
                         }
-                        else {
-                            this.bindObject.setEnable(false)
+                        else{
+                            this.state = true
                         }
-                    } else {
-                        if (!this.bindObject.type) {
-                            this.bindObject.setEnable(false)
+                        this.bindObject.setEnable(this.state,this.bindIndex)
+                    }else{
+                        if(!this.bindObject.type){
+                           this.state = true
                         }
-                        else {
-                            this.bindObject.setEnable(true)
+                        else{
+                            this.state = false
                         }
                         this.bindObject.setEnable(this.state,this.bindIndex)
                     }

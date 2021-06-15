@@ -18,7 +18,7 @@ export default class Platform extends Mesh {
         this.name = "Platform"
         this.floor = floor
         this.ceiling = ceiling
-        console.log(floor, ceiling)
+        this.buttonBinded = []
         if (!this.type) {
             this.block = false
         }
@@ -68,10 +68,38 @@ export default class Platform extends Mesh {
 
         this.box3.copy(this.geometry.boundingBox).applyMatrix4(this.matrixWorld)
 
+        if(!this.type){
+            if(this.buttonBinded.includes(false)){
+                this.block = false
+            }else{
+                this.block = true
+            }
+        }
+        else{
+            if(this.buttonBinded.includes(true)){
+                this.block = false
+            }else{
+                this.block = true
+            }
+        }
     }
 
 
-    setEnable(block) {
-        this.block = block
+    setEnable(enable,index){
+        this.buttonBinded[index] = enable
+     }
+
+    addBind(){
+        if(!this.type){
+            this.buttonBinded.push(true)
+        }
+        else{
+            this.buttonBinded.push(false)
+        }
     }
+
+    getBindIndex(){
+        return this.buttonBinded.length - 1
+    }
+
 }
