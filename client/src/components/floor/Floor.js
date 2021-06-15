@@ -12,15 +12,15 @@ export default class Floor extends Group {
     //  holes: true
     //  holePos: [ "5/3x5/5", etc.. ]
     //}
-    constructor(instructions, camera, scene) {
+    constructor(instructions, scene) {
         super()
         this.instructions = instructions
         this.scene = scene
         this.boxes = []
-        this.init(instructions, camera)
+        this.init(instructions)
     }
 
-    init(instructions, camera) {
+    init(instructions) {
         if (instructions.size) {
             this.coords = instructions.size.split("x")
             this.coords[0] = parseInt(this.coords[0])
@@ -29,9 +29,6 @@ export default class Floor extends Group {
             //Zmienne do wyśrodkowania podłogi na planszy
             this.offsetX = 50 - (this.coords[0] / 2) * 100
             this.offsetZ = 50 - (this.coords[1] / 2) * 100
-
-            //TODO: Ewentualna sprytniejsza zmiana pozycji, ta działa ale nie jest napisana profesjonalnie.
-            camera.updatePosition(0, 300 + (this.coords[0] * 10) + (this.coords[1] * 10), 300 + (this.coords[0] * 20) + (this.coords[1] * 60))
 
             this.createFullArray(instructions)
         }
