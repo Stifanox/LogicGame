@@ -3,8 +3,8 @@ import astra from "../model/Kate animated.fbx"
 import alberto from "../model/Alberto jump test.fbx"
 
 export default class JumpPlayer extends Player {
-    constructor(scene, manager) {
-        super(scene, manager)
+    constructor(scene, manager, camera) {
+        super(scene, manager, camera)
 
         this.doubleJumpAvailable = true
 
@@ -45,7 +45,7 @@ export default class JumpPlayer extends Player {
         })
     }
 
-    updatePlayer() {
+    updatePlayer(camera) {
 
         if (this.box3) {
             this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
@@ -55,9 +55,10 @@ export default class JumpPlayer extends Player {
             this.mixer.checkAnim(this.running, this.jumped)
             this.mixer.update()
         }
-        this.movePlayer()
+        this.movePlayer(camera)
         this.checkFloor()
         this.checkWall()
         this.checkCelling()
+        this.updateCam()
     }
 }

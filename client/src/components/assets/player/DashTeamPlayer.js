@@ -26,12 +26,12 @@ export default class DashPlayerPlayer {
             this.model.children[0].material[1].alphaMap = null
             this.model.children[0].geometry.computeBoundingBox()
             this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
-            this.model.position.set(0, 500, 0)
+            this.model.position.set(2000, 100, 150)
         })
     }
 
-    updateBox(){
-        if(this.model){
+    updateBox() {
+        if (this.model) {
             this.box3 = this.box3.copy(this.model.children[0].geometry.boundingBox).applyMatrix4(this.model.matrixWorld)
         }
     }

@@ -38,10 +38,11 @@ Player wymaga w main =>
 
 //TODO: Zrobić aby model ładowały się w klasach podrzędnych 
 export default class Player {
-    constructor(scene, manager) {
+    constructor(scene, manager, camera) {
         //Animacja
         this.running = false
         //Animacja
+        this.camera = camera
         this.blockMove = false
         this.corretion = true
         this.scene = scene
@@ -56,7 +57,7 @@ export default class Player {
         this.raycasterFloor = new Raycaster(new Vector3(0, 0, 0), new Vector3(0, -1, 0))
         this.raycasterWallUp = new Raycaster(new Vector3(0, 0, 0), new Vector3(0, 0, -1))
         this.raycasterWallDown = new Raycaster(new Vector3(0, 0, 0), new Vector3(0, 0, -1))
-        this.raycasterCelling = new Raycaster(new Vector3(0,0,0), new Vector3(0,1,0))
+        this.raycasterCelling = new Raycaster(new Vector3(0, 0, 0), new Vector3(0, 1, 0))
         this.sceneObjects = this.scene.children
         this.excludeMesh = ["Swap"]
         this.mixer = null
@@ -147,6 +148,7 @@ export default class Player {
             if (!this.blockMove) {
                 this.model.translateZ(4)
             }
+
         }
     }
 
@@ -206,6 +208,8 @@ export default class Player {
             this.createIntersection()
 
             this.model.position.set(-600, 100, 150)
+            this.camera.position.set(-600, 500, 950)
+            this.camera.lookAt(new Vector3(-600, 150, 150))
         })
     }
 
@@ -255,19 +259,19 @@ export default class Player {
         }
     }
 
-    checkCelling(){
-        if(this.model){
-            const ray = new Ray(this.model.position.clone().add(new Vector3(0,50,0)),new Vector3(0,1,0))
+    checkCelling() {
+        if (this.model) {
+            const ray = new Ray(this.model.position.clone().add(new Vector3(0, 50, 0)), new Vector3(0, 1, 0))
             this.raycasterCelling.ray = ray
             const intersects = this.raycasterCelling.intersectObjects(this.sceneObjects)
 
-           if(intersects[0]){
-               if(intersects[0].distance < 125){
-                   this.jumpVelocity = 0
-                   this.doneJumping = true
-                   KeyPressed.jump = false
-               }
-           }
+            if (intersects[0]) {
+                if (intersects[0].distance < 125) {
+                    this.jumpVelocity = 0
+                    this.doneJumping = true
+                    KeyPressed.jump = false
+                }
+            }
         }
     }
     checkWall() {
@@ -281,16 +285,25 @@ export default class Player {
 
             const intersectionDown = this.raycasterWallDown.intersectObjects(this.sceneObjects)
             const intersectionUp = this.raycasterWallUp.intersectObjects(this.sceneObjects)
-
+            //console.log(intersectionDown, intersectionUp)
             if (intersectionDown[0] || intersectionUp[0]) {
                 if ((intersectionDown[0] != undefined && intersectionDown[0].distance < 50) || (intersectionUp[0] != undefined && intersectionUp[0].distance < 50)) {
                     this.blockMove = true
+                } else {
+                    this.blockMove = false
                 }
-            }
-            else{
+            } else {
                 this.blockMove = false
             }
+
         }
+    }
+
+    updateCam() {
+        let posX = this.model.position.x
+        let posY = this.model.position.y
+        this.camera.position.x = posX
+        this.camera.position.y = posY + 500
     }
 }
 

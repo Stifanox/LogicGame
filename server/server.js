@@ -2,6 +2,7 @@ const express = require('express')
 const app = express();
 const http = require('http').Server(app);
 const cors = require('cors')
+const Database = require('nedb')
 const io = require('socket.io')(http,
     {
         cors: {
@@ -19,6 +20,11 @@ app.use(
 );
 
 //TODO: Naprawić sesje
+var levels = new Database({
+    filename: 'levels.db',
+    autoload: true
+});
+
 
 var gameRooms = []
 const handleUser = require('./components/handleUser').handleUser;
@@ -63,9 +69,9 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('A user disconnected');
     });
-    socket.on('joined', function(e){
-            socket.in(socket.request.session.room).emit('gameStart', true)
-            socket.emit("gameStart",true)
+    socket.on('joined', function (e) {
+        socket.in(socket.request.session.room).emit('gameStart', true)
+        socket.emit("gameStart", true)
     });
 });
 

@@ -5,9 +5,8 @@ import Importer from "./Importer"
 
 
 export default class DashPlayer extends Player {
-    constructor(scene, manager) {
-        super(scene, manager)
-
+    constructor(scene, manager, camera) {
+        super(scene, manager, camera)
         this.blockDash = false
         this.dashDistance = 300
         this.initDash()
@@ -114,6 +113,6 @@ export default class DashPlayer extends Player {
         this.checkFloor()
         this.checkWall()
         this.checkCelling()
+        this.updateCam()
     }
-
 }
