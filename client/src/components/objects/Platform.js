@@ -30,8 +30,14 @@ export default class Platform extends Mesh {
     move() {
         if (!this.block) {
             if (this.movingAxis == "Y") {
-                this.position.y > this.celling ? this.positive = true : null;
-                this.position.y < this.floor ? this.positive = false : null;
+                if(this.position.y > this.ceiling){
+                    this.positive = true
+                }
+
+                if(this.position.y < this.floor){
+                    this.positive = false
+                }
+                
                 if (this.positive) {
                     this.translateZ(this.speed)
                 }

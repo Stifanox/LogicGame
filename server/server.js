@@ -18,6 +18,9 @@ app.use(
         extended: true,
     })
 );
+app.use(express.json())
+
+const insertLevel = require("./insertLevel")
 
 //TODO: Naprawić sesje
 var levels = new Database({
@@ -29,6 +32,7 @@ var levels = new Database({
 var gameRooms = []
 const handleUser = require('./components/handleUser').handleUser;
 const { type } = require('os');
+const insertLevelIntoDatabase = require('./insertLevel');
 
 
 app.use(cookieParser())
@@ -51,6 +55,12 @@ app.get('/handleUser', function (req, res) {
     res.end(JSON.stringify(data))
 })
 
+app.post("/getBase", function(req,res){
+    levels.find({level:req.body.level},function(err,docs){
+       res.end(JSON.stringify(docs))
+    })
+})
+
 
 //Cały socket
 io.on('connection', function (socket) {
@@ -59,6 +69,7 @@ io.on('connection', function (socket) {
         socket.request.session.room = room
         console.log('Jesteś w pokoju', room)
         console.log(socket.rooms)
+
     });
     socket.on('position', function (e) {
         socket.in(socket.request.session.room).emit('position', e)

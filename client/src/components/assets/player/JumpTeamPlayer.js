@@ -13,6 +13,7 @@ export default class JumpPlayerPlayer {
         this.mixer = null
         this.model = null
         this.box3 = new Box3()
+        this.doesWon = false
         this.init()
     }
 

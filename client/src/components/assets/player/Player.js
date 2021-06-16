@@ -61,6 +61,7 @@ export default class Player {
         this.sceneObjects = this.scene.children
         this.excludeMesh = ["Swap"]
         this.mixer = null
+        this.doesWon = false
         this.init()
     }
 
