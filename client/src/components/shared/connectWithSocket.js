@@ -2,12 +2,12 @@ import { io } from '../../../node_modules/socket.io/client-dist/socket.io.js'
 
 //funkcja do łączenia się z socketem i przydzielenia gracza do pokoju
 export default function connection(id) {
-    const socket = io('http://localhost:3000')
+    const socket = io('/')
     return new Promise((resolve, reject) => {
         socket.on('connect', function () {
             console.log(sessionStorage)
             if (!sessionStorage.getItem('room')) {
-                fetch("http://localhost:3000/handleUser", {
+                fetch("/handleUser", {
                     method: "GET",
                 }).then(res => res.json()).then(res => {
                     sessionStorage.setItem("room", res.room)

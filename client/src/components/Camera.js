@@ -11,6 +11,8 @@ export default class Camera extends PerspectiveCamera {
         this.position.set(0, 300, 300)
         this.lookAt(0, 100, 0)
 
+        this.basePosY = 500
+
         this.updateSize();
         window.addEventListener('resize', () => this.updateSize(window.innerWidth, window.innerHeight), false);
         document.addEventListener('DOMContentLoaded', () => this.updateSize(window.innerWidth, window.innerHeight), false);
@@ -24,5 +26,13 @@ export default class Camera extends PerspectiveCamera {
     updatePosition(posX, posY, posZ) {
         this.position.set(posX, posY, posZ)
         this.lookAt(0, 100, 0)
+    }
+
+    setBaseHeight(e) {
+        this.basePosY = e
+    }
+
+    getBaseHeight() {
+        return this.basePosY
     }
 }

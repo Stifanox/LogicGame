@@ -304,7 +304,7 @@ export default class Player {
         let posX = this.model.position.x
         let posY = this.model.position.y
         this.camera.position.x = posX
-        this.camera.position.y = posY + 500
+        this.camera.position.y = posY + this.camera.getBaseHeight()
     }
 }
 

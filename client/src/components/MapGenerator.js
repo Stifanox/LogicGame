@@ -12,12 +12,16 @@ import Door from "./objects/Door"
 import ButtonWin from "./objects/ButtonWin"
 
 export default class MapGenerator {
-    constructor(instructions, player, teamPlayer, camera, scene) {
+    constructor(instructions, player, teamPlayer, camera, scene, endLevelScreen, endLevelText, endLevelBt) {
         this.instructions = instructions
         this.player = player
         this.teamPlayer = teamPlayer
         this.camera = camera
         this.scene = scene
+
+        this.endLevelScreen = endLevelScreen
+        this.endLevelText = endLevelText
+        this.endLevelBt = endLevelBt
 
         this.buttons = []
         this.platforms = []
@@ -55,12 +59,18 @@ export default class MapGenerator {
                     this.doors.push(door)
                     break;
                 case "win":
-                    winBt = new ButtonWin(...object.pos, this.scene, this.player, this.teamPlayer)
+                    winBt = new ButtonWin(...object.pos, this.scene, this.player, this.teamPlayer, this.endLevelScreen, this.endLevelText, this.endLevelBt)
                     this.buttonWins.push(winBt)
                     break;
                 case "spikes":
-                    spikes = new Spikes(...object.pos, this.scene, this.player,object.size,...object.respownPoint)
+                    spikes = new Spikes(...object.pos, this.scene, this.player, object.size, ...object.respownPoint)
                     this.spikes.push(spikes)
+                    break;
+                case "camera":
+                    this.camera.setBaseHeight(object.posY)
+                    this.camera.position.y = object.posY
+
+                    this.camera.lookAt(-600, 150, 150)
                     break;
             }
         })

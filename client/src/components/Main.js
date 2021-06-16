@@ -18,14 +18,22 @@ import MapGenerator from './MapGenerator';
 
 
 export default class Main {
-    constructor(container, loadingScreen, loadingAnim, playerInfo) {
+    constructor(container, loadingScreen, loadingAnim, playerInfo, instructionDiv, endLevelScreen, endLevelText, endLevelBt, nextLevelCount) {
+        //Divy dodatkowe
+        this.playersGoal = instructionDiv
+        this.endLevelScreen = endLevelScreen
+        this.endLevelBt = endLevelBt
+        this.endLevelText = endLevelText
+        this.nextLevelCount = nextLevelCount
+
         //Divy z loadingiem
         this.loadingScreen = loadingScreen
         this.loadingAnim = loadingAnim
         this.playerInfo = playerInfo
         this.loading = true
-        console.log("klasa", this.loadingAnim)
+
         let helpCounter = 0
+
         this.loadingAnimation = setInterval(() => {
             this.loadingAnim.innerText = "Loading in progress" + ".".repeat(helpCounter)
             console.log(helpCounter)
@@ -35,6 +43,7 @@ export default class Main {
                 helpCounter++
             }
         }, 200)
+
         this.manager = new LoadingManager()
         this.container = container;
         this.scene = new Scene();
@@ -44,13 +53,14 @@ export default class Main {
         //Zmienna do sprawdzenia czy oboje graczy się załadowało
         this.gameStart = false
 
-        const gridHelper = new GridHelper(3000, 30);
-        this.scene.add(gridHelper);
 
-        const controls = new OrbitControls(this.camera, this.renderer.domElement);
+        // const gridHelper = new GridHelper(3000, 30);
+        // this.scene.add(gridHelper);
+
+        //const controls = new OrbitControls(this.camera, this.renderer.domElement);
 
 
-        
+
         //propy boxów
         this.boxes = [
             // [x (tak jak podłoga), y (na czym ma leżeć box), z (tak jak podłoga), rozmiar w px, rotacja w czymkolwiek chcesz],
@@ -67,7 +77,7 @@ export default class Main {
 
         this.renderer.setClearColor(0xffffff)
 
-        
+
 
         this.init();
 
@@ -79,13 +89,14 @@ export default class Main {
         let playerId
         this.socket = await connection(playerId)
 
-        if(!sessionStorage.getItem("currentLevel")){
-            sessionStorage.setItem("currentLevel","1")
+        if (!sessionStorage.getItem("currentLevel")) {
+            sessionStorage.setItem("currentLevel", "1")
         }
-        const temp = await fetch("http://localhost:3000/getBase",{method:"POST",
-        headers:{"Content-type": "application/json"},
-        body:JSON.stringify({level:parseInt(sessionStorage.getItem("currentLevel"))})
-    })
+        const temp = await fetch("/getBase", {
+            method: "POST",
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify({ level: parseInt(sessionStorage.getItem("currentLevel")) })
+        })
 
         this.objectsToRender = await temp.json()
         console.log(this.objectsToRender);
@@ -98,7 +109,7 @@ export default class Main {
 
         let planeSize = this.objectsToRender[0].floorInstructions[0].size.split("x")
         this.plane = new PlaneGeometry(parseInt(planeSize[0]) * 100, parseInt(planeSize[1]) * 100)
-        this.planeMesh = new Mesh(this.plane, new MeshBasicMaterial({ color: 0x00fa00, side: DoubleSide }))
+        this.planeMesh = new Mesh(this.plane, new MeshBasicMaterial({ color: 0xffffff, side: DoubleSide }))
         this.planeMesh.rotation.x += Math.PI / 2
         this.scene.add(this.planeMesh)
 
@@ -110,21 +121,30 @@ export default class Main {
 
         switch (sessionStorage.getItem("player")) {
             case "1":
-                this.playerInfo.innerText = "You are 1st player - Alberto"
+                this.playerInfo.innerText = "You are the 1st player - Alberto"
+                this.playersGoal.innerText = "Your goal is to both stand on the red button."
                 this.player = new DashPlayer(this.scene, this.manager, this.camera)
                 this.teamPlayer = new JumpTeamPlayer(this.scene)
-                this.mapgenerator = new MapGenerator(this.objectsToRender[0].objects, this.player, this.teamPlayer, this.camera, this.scene)
+                this.mapgenerator = new MapGenerator(this.objectsToRender[0].objects, this.player, this.teamPlayer, this.camera, this.scene, this.endLevelScreen, this.endLevelText, this.endLevelBt)
                 break;
             case "2":
-                this.playerInfo.innerText = "You are 2nd player - Kate"
+                this.playerInfo.innerText = "You are the 2nd player - Joseph"
+                this.playersGoal.innerText = "Your goal is to both stand on the red button."
                 this.player = new JumpPlayer(this.scene, this.manager, this.camera)
                 this.teamPlayer = new DashTeamPlayer(this.scene)
-                this.mapgenerator = new MapGenerator(this.objectsToRender[0].objects, this.player, this.teamPlayer, this.camera, this.scene)
+                this.mapgenerator = new MapGenerator(this.objectsToRender[0].objects, this.player, this.teamPlayer, this.camera, this.scene, this.endLevelScreen, this.endLevelText, this.endLevelBt)
                 break;
         }
         this.manager.onLoad = () => {
             if (sessionStorage.getItem("player") == "2") {
                 dataEmit(this.socket, sessionStorage.getItem("player"), "joined")
+            }
+        }
+        this.ready = false
+        this.endLevelBt.onclick = () => {
+            if (!this.ready) {
+                dataEmit(this.socket, "ready", "playerReady")
+                this.ready = true
             }
         }
 
@@ -134,6 +154,28 @@ export default class Main {
             this.gameStart = true
         })
 
+        this.socket.on("changeLevel", e => {
+            sessionStorage.setItem("currentLevel", e)
+            location.reload()
+        })
+
+        //Poczekalnia po wygraniu poziomu
+        this.playersCount = 0
+        this.socket.on("playerReady", e => {
+            this.playersCount++
+            this.nextLevelCount.innerText = this.playersCount + "/2"
+            if (this.playersCount == 2) {
+                if (parseInt(sessionStorage.getItem("currentLevel")) < 3) {
+                    sessionStorage.setItem("currentLevel", parseInt(sessionStorage.getItem("currentLevel")) + 1)
+                    dataEmit(this.socket, sessionStorage.getItem("currentLevel"), "changeLevel")
+                    location.reload()
+                } else {
+                    sessionStorage.setItem("currentLevel", "1")
+                    dataEmit(this.socket, sessionStorage.getItem("currentLevel"), "changeLevel")
+                    location.reload()
+                }
+            }
+        })
 
         this.render();
 
