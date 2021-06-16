@@ -59,7 +59,7 @@ export default class MapGenerator {
                     this.buttonWins.push(winBt)
                     break;
                 case "spikes":
-                    spikes = new Spikes(...object.pos, this.scene, this.player)
+                    spikes = new Spikes(...object.pos, this.scene, this.player,object.size,...object.respownPoint)
                     this.spikes.push(spikes)
                     break;
             }

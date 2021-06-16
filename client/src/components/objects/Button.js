@@ -24,13 +24,11 @@ export default class Button extends Mesh {
                 this.state = true
                 this.bindObject.addBind()
                 this.bindIndex = this.bindObject.getBindIndex()
-                console.log(this.bindIndex);
             }
             else {
                 this.state = false
                 this.bindObject.addBind()
                 this.bindIndex = this.bindObject.getBindIndex()
-                console.log(this.bindIndex);
             }
         }
     }
@@ -68,8 +66,6 @@ export default class Button extends Mesh {
                     } else {
                         this.state = false
                     }
-                    //buton 1 -> index 0 state: false
-                    //buton 2 -> index 1 state: false
                     this.bindObject.setEnable(this.state, this.bindIndex)
                 }
         }

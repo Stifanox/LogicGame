@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    Giercowanie
+  </title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display&display=swap" rel="stylesheet">
+  <style>
+    body {
+      padding: 0;
+      margin: 0 auto;
+      font-family: 'Red Hat Display';
+    }
+
+    #info {
+      position: absolute;
+      top: 200px;
+      left: 200px;
+      max-width: 40%;
+      border: 1px solid black;
+    }
+
+    #overlayer {
+      background-color: #181818;
+      color: #e4e4e4;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #loading {
+      font-size: 60px;
+    }
+
+    #playerinfo {
+      font-size: 40px;
+    }
+
+    #endlevel {
+      background-color: #181818;
+      color: #e4e4e4;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #nextlvl {
+      background-color: #FA6835;
+      border: none;
+      color: #e4e4e4;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #nextlvl:hover {
+      background-color: #FACB35;
+    }
+
+    #text {
+      font-size: 40px;
+      text-align: center;
+    }
+  </style>
+<script defer src="index.js?cf8a500ae719033c8667"></script></head>
+
+<body>
+  <div id="root"></div>
+  <div id="overlayer">
+    <div id="logo"></div>
+    <div id="playerinfo"></div>
+    <div id="loading">Loading in progress</div>
+    <div id="towin"></div>
+  </div>
+  <div id="endlevel">
+    <p id="text"></p>
+    <button id="nextlvl">Next Level</button>
+    <p id="playersReady"></p>
+  </div>
+</body>
+
+</html>

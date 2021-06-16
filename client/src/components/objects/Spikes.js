@@ -2,14 +2,16 @@ import { Box3, BoxGeometry, ConeGeometry, Mesh, MeshBasicMaterial, Vector2, Vect
 
 
 export default class Spikes extends Mesh{
-    constructor(posX,posY,posZ,scene,player) {
-        super(new BoxGeometry(700,50,500), new MeshBasicMaterial({color:0xf23212,transparent:true,opacity:0.5}))
+    constructor(posX,posY,posZ,scene,player,size,resX,resY,resZ) {
+        super(new BoxGeometry(size,50,size), new MeshBasicMaterial({color:0xf23212,transparent:true,opacity:0.5}))
 
         this.player = player
-        this.coneDimensions = [30,this.geometry.parameters.height,30]
         this.x= posX
         this.y= posY
         this.z= posZ
+        this.resX = resX
+        this.resY = resY
+        this.resZ = resZ
         this.box3= new Box3()
         this.scene = scene
         this.init()
@@ -19,14 +21,7 @@ export default class Spikes extends Mesh{
         this.geometry.computeBoundingBox()
         this.position.set(this.x,this.y,this.z)
 
-        for(let i=1; i<4; i++){
-            for(let j=1; j<4; j++){
-                const cone = new Mesh(new ConeGeometry(...this.coneDimensions))
-             this.children.push(cone)
-
-             cone.position.set(-70+this.position.x+j*30,this.position.y,-60+this.position.z+i*30)
-            }
-     }
+        
         this.scene.add(this)
 
     }
@@ -38,7 +33,7 @@ export default class Spikes extends Mesh{
         const intersect = this.box3.intersectsBox(this.player.box3)
 
         if(intersect){
-           this.player.model.position.set(-600,150,150)
+           this.player.model.position.set(this.resX,this.resY,this.resZ)
         }
     }
     }

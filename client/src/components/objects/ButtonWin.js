@@ -11,17 +11,36 @@ export default class Button extends Mesh{
         this.scene = scene
         this.scene.add(this)
         this.oneFrameDiffrence = false
+        this.woned = false
         
     }
 
     checkWin(){
         this.box3.copy(this.geometry.boundingBox).applyMatrix4(this.matrixWorld)
 
-        if((this.box3.intersectsBox(this.player.box3) || this.box3.intersectsBox(this.teamPlayer.box3)) && this.oneFrameDiffrence){
-            alert("Wygrałeś")
+        if(this.box3.intersectsBox(this.player.box3) && this.oneFrameDiffrence){
+            this.player.doesWin = true
         }
-        
+        else{
+            this.player.doesWin = false
+        }
+
+        if( this.box3.intersectsBox(this.teamPlayer.box3) && this.oneFrameDiffrence){
+            this.teamPlayer.doesWin = true
+        }
+        else{
+            this.teamPlayer.doesWin = false
+        }
+
+        if(this.teamPlayer.doesWin && this.player.doesWin){
+            if(!this.woned){
+                sessionStorage.setItem("currentLevel",parseInt(sessionStorage.getItem("currentLevel"))+1)
+                location.reload()
+                this.woned = true
+            }
+        }
         this.oneFrameDiffrence = true
+
         
     }
 
