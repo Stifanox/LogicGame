@@ -17,6 +17,9 @@
     "ws": "^7.4.6"
   },
   "devDependencies": {
+    "@babel/core": "^7.18.5",
+    "@babel/preset-env": "^7.18.2",
+    "babel-loader": "^8.2.5",
     "file-loader": "^6.2.0",
     "three": "^0.126.0",
     "url-loader": "^4.1.1"
