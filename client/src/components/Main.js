@@ -13,6 +13,7 @@ import DashTeamPlayer from './assets/player/DashTeamPlayer'
 
 import connection from './shared/connectWithSocket'
 import dataEmit from './shared/dataEmit'
+import SyncClock from './SyncClock'
 
 import MapGenerator from './MapGenerator';
 
@@ -32,6 +33,8 @@ export default class Main {
         this.playerInfo = playerInfo
         this.loading = true
 
+
+        this.syncClock = new SyncClock(60,this.render.bind(this))
         let helpCounter = 0
 
         this.loadingAnimation = setInterval(() => {
@@ -177,8 +180,8 @@ export default class Main {
             }
         })
 
-        this.render();
-
+        // this.render()
+        this.syncClock.start()
     }
 
     render() {
@@ -206,7 +209,7 @@ export default class Main {
 
         }
 
-        requestAnimationFrame(this.render.bind(this));
+        // requestAnimationFrame(this.render.bind(this));
 
     }
 }
