@@ -34,7 +34,7 @@ export default class Main {
         this.loading = true
 
 
-        this.syncClock = new SyncClock(60,this.render.bind(this))
+        this.syncClock = new SyncClock(60, this.render.bind(this))
         let helpCounter = 0
 
         this.loadingAnimation = setInterval(() => {
@@ -179,13 +179,31 @@ export default class Main {
                 }
             }
         })
+        if (sessionStorage.getItem("player") == "1") {
+            let movableObjects = []
+            this.mapgenerator.getMovable().forEach(obj => {
+                let singleObject = { id: obj.srvId, floor: obj.floor, ceiling: obj.ceiling, pos: obj.position, movingAxis: obj.movingAxis, type: obj.name == "Platform" ? obj.type : null, speed: obj.speed, buttonBinded: obj.buttonBinded }
+                movableObjects.push(singleObject)
+            })
+            dataEmit(this.socket, { objects: movableObjects }, "map-objects")
+        }
 
+        console.log(this.mapgenerator.getMovable())
         // this.render()
         this.syncClock.start()
     }
 
     render() {
+
         if (this.gameStart) {
+            if (sessionStorage.getItem("player") == "1") {
+                let movableObjects = []
+                this.mapgenerator.getMovable().forEach(obj => {
+                    let singleObject = { id: obj.srvId, floor: obj.floor, ceiling: obj.ceiling, pos: obj.position, movingAxis: obj.movingAxis, type: obj.name == "Platform" ? obj.type : null, speed: obj.speed, buttonBinded: obj.buttonBinded }
+                    movableObjects.push(singleObject)
+                })
+                dataEmit(this.socket, { objects: movableObjects }, "map-objects")
+            }
             if (this.player.model)
                 //Emitowanie i przyjmowanie danych o pozycji teammate'a i jego rotacji
                 if (this.player.model) {

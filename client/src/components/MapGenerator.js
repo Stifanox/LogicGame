@@ -11,6 +11,8 @@ import Button from "./objects/Button"
 import Door from "./objects/Door"
 import ButtonWin from "./objects/ButtonWin"
 
+import dataEmit from './shared/dataEmit';
+
 export default class MapGenerator {
     constructor(instructions, player, teamPlayer, camera, scene, endLevelScreen, endLevelText, endLevelBt) {
         this.instructions = instructions
@@ -40,10 +42,11 @@ export default class MapGenerator {
         let platform
         let winBt
         let spikes
-        this.instructions.forEach(object => {
+        //FIXME: CZYSZCZENIE TABLICY NA SERWERZE
+        this.instructions.forEach((object, id) => {
             switch (object.type) {
                 case "platform":
-                    platform = new Platform(...object.pos, object.size, this.scene, object.axis, this.player, object.move, object.color, object.floor, object.ceiling)
+                    platform = new Platform(...object.pos, object.size, this.scene, object.axis, this.player, object.move, object.color, object.floor, object.ceiling, id)
                     object.buttons.forEach(button => {
                         sbutton = new Button(...button.pos, this.scene, platform, this.player, this.teamPlayer, button.color)
                         this.buttons.push(sbutton)
@@ -51,7 +54,7 @@ export default class MapGenerator {
                     this.platforms.push(platform)
                     break;
                 case "door":
-                    door = new Door(...object.pos, this.scene, object.color, object.speed, object.floor, object.ceiling)
+                    door = new Door(...object.pos, this.scene, object.color, object.speed, object.floor, object.ceiling, id)
                     object.buttons.forEach(button => {
                         sbutton = new Button(...button.pos, this.scene, door, this.player, this.teamPlayer, button.color)
                         this.buttons.push(sbutton)
@@ -132,5 +135,9 @@ export default class MapGenerator {
 
     getWinButton() {
         return this.buttonWins
+    }
+
+    getMovable() {
+        return [...this.doors, ...this.platforms]
     }
 }

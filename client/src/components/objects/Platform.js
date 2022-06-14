@@ -2,7 +2,7 @@ import { Box3, DoubleSide, Mesh, MeshBasicMaterial, PlaneGeometry } from "three"
 
 //TODO:Zrobić dynamiczne ustawianie obiektów
 export default class Platform extends Mesh {
-    constructor(posX, posY, posZ, size, scene, movingAxis, player, type, color, floor, ceiling) {
+    constructor(posX, posY, posZ, size, scene, movingAxis, player, type, color, floor, ceiling, id) {
         super(new PlaneGeometry(200 * size, 200 * size), new MeshBasicMaterial({ side: DoubleSide, color: color }))
         this.geometry.computeBoundingBox()
         this.player = player
@@ -19,6 +19,7 @@ export default class Platform extends Mesh {
         this.floor = floor
         this.ceiling = ceiling
         this.buttonBinded = []
+        this.srvId = id
         if (!this.type) {
             this.block = false
         }

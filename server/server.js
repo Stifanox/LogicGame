@@ -75,6 +75,9 @@ io.on('connection', function (socket) {
     socket.on('position', function (e) {
         socket.in(socket.request.session.room).emit('position', e)
     });
+    socket.on('map-objects', function (e) {
+
+    })
     socket.on('player', function (e) {
         socket.emit('player', e)
     })

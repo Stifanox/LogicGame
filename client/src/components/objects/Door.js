@@ -2,7 +2,7 @@ import { Mesh, BoxGeometry, MeshBasicMaterial, DoubleSide } from "three";
 
 //TODO: Zrobić dynamiczne ustawianie danych dla pozycji oraz celling i floor
 export default class Door extends Mesh {
-    constructor(posX, posY, posZ, scene, color, speed, floor, ceiling) {
+    constructor(posX, posY, posZ, scene, color, speed, floor, ceiling, id) {
         super(new BoxGeometry(500, 500, 30), new MeshBasicMaterial({ color: color, side: DoubleSide }))
         this.scene = scene
         this.rotation.y = Math.PI / 2
@@ -13,6 +13,7 @@ export default class Door extends Mesh {
         this.floor = floor
         this.speed = speed
         this.buttonBinded = []
+        this.srvId = id
     }
 
     changeDoorState() {
