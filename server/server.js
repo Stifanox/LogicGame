@@ -34,6 +34,8 @@ var gameRooms = []
 const handleUser = require('./components/handleUser').handleUser;
 const { type } = require('os');
 const insertLevelIntoDatabase = require('./insertLevel');
+const doorLogic = require('./logic/DoorLogic');
+const platformLogic = require('./logic/PlatformLogic');
 
 
 app.use(cookieParser())
@@ -76,7 +78,43 @@ io.on('connection', function (socket) {
         socket.in(socket.request.session.room).emit('position', e)
     });
     socket.on('map-objects', function (e) {
-
+        const moveableObjects = e
+        const newMoveableObjects = []
+        moveableObjects.objects.forEach((object,index) =>{
+            if (object.name == "Door"){
+                const newPosForDoor = doorLogic(
+                    object.pos.y,
+                    object.speed,
+                    object.ceiling,
+                    object.floor,
+                    object.buttonBinded
+                )
+                const newObject = {...object}
+                newObject.pos.y = newPosForDoor
+                newMoveableObjects.push(newObject)
+            }
+            else if(object.name == "Platform"){
+                const newPositions = platformLogic(
+                    object.pos.x,
+                    object.pos.z,
+                    object.movingAxis,
+                    object.speed,
+                    object.ceiling,
+                    object.floor,
+                    object.buttonBinded,
+                    object.positive
+                )
+                const newObject = {...object}
+                newObject.pos.z = newPositions.z
+                newObject.pos.x = newPositions.x
+                newObject.positive = newPositions.positive
+                
+                newMoveableObjects.push(newObject)
+            }
+        })
+        // socket.in(socket.request.session.room).emit('new-map-objects',{objects:newMoveableObjects})
+        io.in(socket.request.session.room).emit('new-map-objects',{objects:newMoveableObjects})
+        // socket.emit()
     })
     socket.on('player', function (e) {
         socket.emit('player', e)

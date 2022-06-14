@@ -89,7 +89,6 @@ export default class MapGenerator {
         })
         this.buttons.forEach(button => {
             this.scene.add(button)
-            console.log(button.position)
         })
         this.spikes.forEach(spike => {
             this.scene.add(spike)
@@ -98,14 +97,14 @@ export default class MapGenerator {
             this.scene.add(button)
         })
     }
-
+    //Atkualnie poruszanie sie drzwi i platform dzieje się w pliku main wraz z pomocą socketów
     checkInRender() {
-        this.platforms.forEach(platform => {
-            platform.move()
-        })
-        this.doors.forEach(door => {
-            door.changeDoorState()
-        })
+        // this.platforms.forEach(platform => {
+        //     platform.move()
+        // })
+        // this.doors.forEach(door => {
+        //     door.move()
+        // })
         this.buttons.forEach(button => {
             button.checkAction()
         })
@@ -115,6 +114,19 @@ export default class MapGenerator {
         this.buttonWins.forEach(button => {
             button.checkWin()
         })
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     */
+    getObjectById(id){
+        const doorObject = this.doors.find(el => el.srvId == id)
+        const platformObject = this.platforms.find(el => el.srvId == id)
+
+        if (doorObject != undefined) return doorObject
+        else if (platformObject != undefined) return platformObject
+
     }
 
     getButtons() {

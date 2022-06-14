@@ -20,7 +20,6 @@ class FpsController {
     };
   
     start = () => {
-        console.log("Start")
       if (!this.isPlaying) {
         this.isPlaying = true;
         this.tref = requestAnimationFrame(this.loop);

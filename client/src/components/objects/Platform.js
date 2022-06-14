@@ -28,24 +28,26 @@ export default class Platform extends Mesh {
         }
     }
 
-    move() {
+    move(position,positive) {
         if (!this.block) {
             if (this.movingAxis == "Y") {
-                if (this.position.y > this.ceiling) {
-                    this.positive = true
-                }
 
-                if (this.position.y < this.floor) {
-                    this.positive = false
-                }
 
-                if (this.positive) {
-                    this.translateZ(this.speed)
-                }
-                else {
-                    this.translateZ(-this.speed)
-                }
+                this.position.set(position.x,position.y,position.z)
+                // if (this.position.y > this.ceiling) {
+                //     this.positive = true
+                // }
 
+                // if (this.position.y < this.floor) {
+                //     this.positive = false
+                // }
+
+                // if (this.positive) {
+                //     this.translateZ(this.speed)
+                // }
+                // else {
+                //     this.translateZ(-this.speed)
+                // }
 
                 if (this.player.box3) {
                     if (this.box3.intersectsBox(this.player.box3)) {
@@ -55,17 +57,11 @@ export default class Platform extends Mesh {
             }
             //TODO:Ustawiać wartości w konstruktorze
             else if (this.movingAxis == "X") {
-                this.position.x > this.ceiling ? this.positive = false : null;
-                this.position.x < this.floor ? this.positive = true : null;
-                if (this.positive) {
-                    this.translateX(this.speed)
-                }
-                else {
-                    this.translateX(-this.speed)
-                }
+                this.position.set(position.x,position.y,position.z)
+                this.positive = positive
+                
                 if (this.player.box3) {
                     if (this.box3.intersectsBox(this.player.box3)) {
-
                         this.positive ? this.player.model.position.x += this.speed : this.player.model.position.x -= this.speed
                     }
                 }

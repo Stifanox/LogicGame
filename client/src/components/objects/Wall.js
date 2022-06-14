@@ -40,7 +40,6 @@ export default class Wall extends Group {
                     wallMesh.position.set(0, this.instructions.levelY / 2, parseInt(this.size[1]) * 50)
                     break;
             }
-            console.log(wallMesh)
             this.add(wallMesh)
         }
         this.addtoscene()

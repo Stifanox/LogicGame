@@ -16,17 +16,19 @@ export default class Door extends Mesh {
         this.srvId = id
     }
 
-    changeDoorState() {
-        if (!this.buttonBinded.includes(true)) {
-            if (this.position.y > this.floor) {
-                this.translateY(-this.speed)
-            }
-        }
-        else {
-            if (this.position.y < this.ceiling) {
-                this.translateY(this.speed)
-            }
-        }
+    move(position) {
+        this.position.set(position.x,position.y,position.z)
+
+        // if (!this.buttonBinded.includes(true)) {
+        //     if (this.position.y > this.floor) {
+        //         this.translateY(-this.speed)
+        //     }
+        // }
+        // else {
+        //     if (this.position.y < this.ceiling) {
+        //         this.translateY(this.speed)
+        //     }
+        // }
     }
     getEnable() {
         return this.enable

@@ -39,7 +39,6 @@ export default class Main {
 
         this.loadingAnimation = setInterval(() => {
             this.loadingAnim.innerText = "Loading in progress" + ".".repeat(helpCounter)
-            console.log(helpCounter)
             if (helpCounter == 3) {
                 helpCounter = 0
             } else {
@@ -102,7 +101,6 @@ export default class Main {
         })
 
         this.objectsToRender = await temp.json()
-        console.log(this.objectsToRender);
 
         this.objectsToRender[0].floorInstructions.forEach(floor => {
             new Floor(floor, this.scene)
@@ -179,6 +177,8 @@ export default class Main {
                 }
             }
         })
+        
+        //Jeżeli jesteś graczem 1 to wysyłasz na serwer informacje o stanie obiektów
         if (sessionStorage.getItem("player") == "1") {
             let movableObjects = []
             this.mapgenerator.getMovable().forEach(obj => {
@@ -188,9 +188,22 @@ export default class Main {
             dataEmit(this.socket, { objects: movableObjects }, "map-objects")
         }
 
-        console.log(this.mapgenerator.getMovable())
-        // this.render()
+        //zaczęcie funkcji render
         this.syncClock.start()
+        //Odebranie informacji o stanie obiektów -> serwer porusza obiektami
+        this.socket.on('new-map-objects',(e) =>{
+            e.objects.forEach(object =>{
+                const objectToMove = this.mapgenerator.getObjectById(object.id)
+                if (object.name == "Door") objectToMove.move(object.pos)
+                else if(object.name == "Platform") objectToMove.move(object.pos,object.positive)
+            })
+        })
+        //Dodanie eventlistenera aby obierać pozycje o teammate
+        this.socket.on("position", (e) => {
+            this.teamPlayer.model.position.set(e.pos.x, e.pos.y, e.pos.z)
+            this.teamPlayer.model.rotation.y = e.rot
+            this.teamPlayer.mixer.checkAnim(e.animations[0], e.animations[1])
+        })
     }
 
     render() {
@@ -199,7 +212,16 @@ export default class Main {
             if (sessionStorage.getItem("player") == "1") {
                 let movableObjects = []
                 this.mapgenerator.getMovable().forEach(obj => {
-                    let singleObject = { id: obj.srvId, floor: obj.floor, ceiling: obj.ceiling, pos: obj.position, movingAxis: obj.movingAxis, type: obj.name == "Platform" ? obj.type : null, speed: obj.speed, buttonBinded: obj.buttonBinded }
+                    let singleObject = { id: obj.srvId,
+                         floor: obj.floor,
+                         ceiling: obj.ceiling,
+                         pos: obj.position,
+                         movingAxis: obj.movingAxis,
+                         type: obj.name == "Platform" ? obj.type : null,
+                         speed: obj.speed,
+                         buttonBinded: obj.buttonBinded,
+                         name:obj.name,
+                         positive: obj.name == "Platform" ? obj.positive:null}
                     movableObjects.push(singleObject)
                 })
                 dataEmit(this.socket, { objects: movableObjects }, "map-objects")
@@ -210,24 +232,18 @@ export default class Main {
                     dataEmit(this.socket, { pos: this.player.model.position, rot: this.player.model.rotation.y, animations: [this.player.running, this.player.jumped] }, "position")
                 }
             if (this.teamPlayer.model) {
-                this.socket.on("position", (e) => {
-                    this.teamPlayer.model.position.set(e.pos.x, e.pos.y, e.pos.z)
-                    this.teamPlayer.model.rotation.y = e.rot
-                    this.teamPlayer.mixer.checkAnim(e.animations[0], e.animations[1])
-                })
+                
                 this.teamPlayer.mixer.update()
             }
 
+            
+
             this.player.updatePlayer()
             this.teamPlayer.updateBox()
-
             this.mapgenerator.checkInRender()
 
             this.renderer.render(this.scene, this.camera);
 
         }
-
-        // requestAnimationFrame(this.render.bind(this));
-
     }
 }
