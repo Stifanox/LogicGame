@@ -2,7 +2,7 @@
 /**
  * 
  * @param {number} posX 
- * @param {number} posZ 
+ * @param {number} posY 
  * @param {number} movingAxis 
  * @param {string} type 
  * @param {Array} bindingButtons 
@@ -10,18 +10,25 @@
  * @param {number} floor
  * @param {number} speed
  */
-function platformLogic(posX,posZ,movingAxis,speed,ceiling,floor,bindingButtons,positive){
+function platformLogic(posX,posY,movingAxis,speed,ceiling,floor,bindingButtons,positive){
     let positiveState = positive
     let newPosX = posX
-    let newPosZ = posZ
+    let newPosY = posY
     
-    if (!bindingButtons.includes(true)) return {x:newPosX,z:newPosZ}
+    if (!bindingButtons.includes(true)) return {x:newPosX,y:newPosY}
 
     //TODO:naprawić osie aby poruszało się góra/dół
     if(movingAxis == "Y"){
-        posZ > ceiling ? positiveState = true : null
-        posZ < floor ? positiveState = false : null
-        positive ? newPosZ += speed:newPosZ -= speed
+        posY > ceiling ? positiveState = false : null
+        posY < floor ? positiveState = true : null
+        
+        if(positiveState){
+             newPosY += speed
+        }
+        else{
+            newPosY -= speed
+        }
+        
     }
     else if (movingAxis == "X"){
         posX > ceiling ? positiveState = false : null;
@@ -33,7 +40,7 @@ function platformLogic(posX,posZ,movingAxis,speed,ceiling,floor,bindingButtons,p
             newPosX -= speed
         }
     }
-    return {x:newPosX,z:newPosZ,positive:positiveState}
+    return {x:newPosX,y:newPosY,positive:positiveState}
 }
 
 module.exports = platformLogic

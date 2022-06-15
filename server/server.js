@@ -96,7 +96,7 @@ io.on('connection', function (socket) {
             else if(object.name == "Platform"){
                 const newPositions = platformLogic(
                     object.pos.x,
-                    object.pos.z,
+                    object.pos.y,
                     object.movingAxis,
                     object.speed,
                     object.ceiling,
@@ -105,7 +105,7 @@ io.on('connection', function (socket) {
                     object.positive
                 )
                 const newObject = {...object}
-                newObject.pos.z = newPositions.z
+                newObject.pos.y = newPositions.y
                 newObject.pos.x = newPositions.x
                 newObject.positive = newPositions.positive
                 

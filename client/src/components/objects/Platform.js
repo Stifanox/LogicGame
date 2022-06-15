@@ -34,24 +34,11 @@ export default class Platform extends Mesh {
 
 
                 this.position.set(position.x,position.y,position.z)
-                // if (this.position.y > this.ceiling) {
-                //     this.positive = true
-                // }
-
-                // if (this.position.y < this.floor) {
-                //     this.positive = false
-                // }
-
-                // if (this.positive) {
-                //     this.translateZ(this.speed)
-                // }
-                // else {
-                //     this.translateZ(-this.speed)
-                // }
+                this.positive = positive
 
                 if (this.player.box3) {
                     if (this.box3.intersectsBox(this.player.box3)) {
-                        this.positive ? this.player.model.position.y -= this.speed : this.player.model.position.y += this.speed
+                        this.positive ? this.player.model.position.y += this.speed : this.player.model.position.y -= this.speed
                     }
                 }
             }
